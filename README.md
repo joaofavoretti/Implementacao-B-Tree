@@ -33,8 +33,8 @@ make memleak
 
 ## Estrutura de pastas do projeto
 
-**src**: .c com funcoes do código
-**include**: .h do código
-**tests**: Onde estará os casos teste liberados
-**main.h**: Programa principal do código
-**Makefile**: Arquivo utilitário para compilacao e execucao de código
+- **src**: .c com funcoes do código
+- **include**: .h do código
+- **tests**: Onde estará os casos teste liberados
+- **main.h**: Programa principal do código
+- **Makefile**: Arquivo utilitário para compilacao e execucao de código
