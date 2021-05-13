@@ -4,8 +4,8 @@
 
 CC = gcc
 MAIN = main.c
-PROG = main
-FUNCTIONS = src/*.c
+PROG = tests/main
+FUNCTIONS = src/*.c funcao-fornecida.c
 INCLUDE = include
 
 all: main.c

@@ -11,4 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Declaracao de funcoes fornecidas no trabalho */
+void binarioNaTela(char *nomeArquivoBinario);
+void scan_quote_string(char *str);
+
+
 #endif
