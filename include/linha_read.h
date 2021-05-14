@@ -36,7 +36,7 @@ typedef struct {
     char removido;              // 1 byte
     int tamanhoRegistro;        // 4 bytes
     int codLinha;               // 4 bytes
-    char aceitaCartao;          // 1 bytes
+    char aceitaCartao;          // 1 byte
     int tamanhoNome;            // 4 bytes
     char nomeLinha[128];        // Tamanho variavel (máximo 128 bytes)
     int tamanhoCor;             // 4 bytes
@@ -54,5 +54,12 @@ typedef struct {
     linha_header *header;     // Ponteiro para o header do arquivo mantido em RAM
     linha_data *data;         // Ponteiro para 1 registro de dados mantido em RAM
 } linha_file;
+
+linha_file *read_csv_linha_file (char *csvFileName, char *binFileName);
+linha_header *read_csv_linha_header(FILE *csvFilePointer, FILE *binFilePointer);
+void update_binary_linha_header(linha_header *header, FILE *binFilePointer);
+linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer, FILE *binFilePointer);
+void append_binary_linha_data (linha_header *header, linha_data *data, FILE *binFilePointer);
+void close_binary_linha_file(linha_file* file);
 
 #endif

@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-#define VEICULO_HEADER_SIZE 174     /* Tamanho do cabecalho do ao arquivo binario veiculo */
+#define VEICULO_HEADER_SIZE 175     /* Tamanho do cabecalho do ao arquivo binario veiculo */
                                     /* Usado para calcular o offset do primeiro registro de dados */
 
 /**

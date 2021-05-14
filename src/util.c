@@ -26,16 +26,18 @@ char *generate_bin_filename(char *fileName)
     strcpy(binFilename, strtok(iterateString, "."));
     strcpy(&binFilename[strlen(binFilename)], ".bin");
 
+    free(iterateString);
+
    return binFilename;
 }
 
-void print_header(veiculo_header *header)
+void print__veiculo_header(veiculo_header *header)
 {
     /**
      * Funcão para debug. Imprimir struct veiculo_header com labels.
      * @param header struct alocada para ser impressa
     */
-    printf("### HEADER ###\n");
+    printf("### VEICULO HEADER ###\n");
     printf("status: %c\n", header->status);
     printf("byteProxReg: %lld\n", header->byteProxReg);
     printf("nroRegistros: %d\n", header->nroRegistros);
@@ -52,14 +54,14 @@ void print_header(veiculo_header *header)
     return;
 }
 
-void print_data(veiculo_data *data)
+void print__veiculo_data(veiculo_data *data)
 {
     /**
      * Funcão para debug. Imprimir struct veiculo_data com labels.
      * @param data struct alocada para ser impressa
     */
 
-    printf("### DATA ###\n");
+    printf("### VEICULO DATA ###\n");
     printf("removido: %c\n", data->removido);
     printf("tamanhoRegistro: %d\n", data->tamanhoRegistro);
     printf("prefixo: %s\n", data->prefixo);
@@ -70,6 +72,49 @@ void print_data(veiculo_data *data)
     printf("modelo: %s\n", data->modelo);
     printf("tamanhoCategoria: %d\n", data->tamanhoCategoria);
     printf("categoria: %s\n", data->categoria);
+
+    fflush(stdout);
+
+    return;
+}
+
+void print__linha_header(linha_header *header)
+{
+    /**
+     * Funcão para debug. Imprimir struct linha_header com labels.
+     * @param header struct alocada para ser impressa
+    */
+    printf("### LINHA HEADER ###\n");
+    printf("status: %c\n", header->status);
+    printf("byteProxReg: %lld\n", header->byteProxReg);
+    printf("nroRegistros: %d\n", header->nroRegistros);
+    printf("nroRegRemovidos: %d\n", header->nroRegRemovidos);
+    printf("descreveCodigo: %s\n", header->descreveCodigo);
+    printf("descreveCartao: %s\n", header->descreveCartao);
+    printf("descreveNome: %s\n", header->descreveNome);
+    printf("descreveCor: %s\n", header->descreveCor);
+
+    fflush(stdout);
+
+    return;
+}
+
+void print__linha_data(linha_data *data)
+{
+    /**
+     * Funcão para debug. Imprimir struct linha_data com labels.
+     * @param data struct alocada para ser impressa
+    */
+
+    printf("### LINHA DATA ###\n");
+    printf("removido: %c\n", data->removido);
+    printf("tamanhoRegistro: %d\n", data->tamanhoRegistro);
+    printf("codLinha: %d\n", data->codLinha);
+    printf("aceitaCartao: %c\n", data->aceitaCartao);
+    printf("tamanhoNome: %d\n", data->tamanhoNome);
+    printf("nomeLinha: %s\n", data->nomeLinha);
+    printf("tamanhoCor: %d\n", data->tamanhoCor);
+    printf("corLinha: %s\n", data->corLinha);
 
     fflush(stdout);
 
