@@ -12,7 +12,7 @@
 #define LINHA_HEADER_SIZE 82     /* Tamanho do cabecalho do ao arquivo binario linha */
 
 /**
- * Struct para armazenar o cabecalho do arquivo tipo veiculo
+ * Struct para armazenar o cabecalho do arquivo tipo linha
 */
 typedef struct {
     char status;                // 1 byte
@@ -30,7 +30,7 @@ typedef struct {
 #define LINHA_DATA_DEFAULT_SIZE 13 /* Tamanho padrao struct linha_data sem contar campo: "removido", "tamanhoRegistro", "nomeLinha", "corLinha" */
 
 /**
- * Struct para armazenar um registro de dados por vez
+ * Struct para armazenar um registro de dados do tipo linha por vez
 */
 typedef struct {
     char removido;              // 1 byte
@@ -47,7 +47,7 @@ typedef struct {
  * Arquivo para armazenar:
  *  - Ponteiro para o arquivo binario
  *  - Ponteiro para a struct de cabecalho que será atualizada quando a struct for liberada da memoria
- *  - Ponteiro para a ultima struct de dados manipulado (veiculo_data)
+ *  - Ponteiro para a ultima struct de dados manipulado (linha_data)
 */
 typedef struct {
     FILE *fp;                 // File pointer para o arquivo de registro de dados
