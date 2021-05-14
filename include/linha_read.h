@@ -19,10 +19,10 @@ typedef struct {
     long long int byteProxReg;  // 8 bytes
     int nroRegistros;           // 4 bytes
     int nroRegRemovidos;        // 4 bytes
-    char descreveCódigo[32];    // 15 bytes field
+    char descreveCodigo[32];    // 15 bytes field
     char descreveCartao[16];    // 13 bytes field
     char descreveNome[16];      // 13 bytes
-    char descreveLinha[32];     // 24 bytes
+    char descreveCor[32];       // 24 bytes
                                 // 82 bytes
 } linha_header;
 
