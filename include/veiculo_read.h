@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #define VEICULO_HEADER_SIZE 174     /* Tamanho do cabecalho do ao arquivo binario veiculo */
+                                    /* Usado para calcular o offset do primeiro registro de dados */
 
 /**
  * Struct para armazenar o cabecalho do arquivo tipo veiculo
@@ -30,6 +31,7 @@ typedef struct {
 
 
 #define VEICULO_DATA_DEFAULT_SIZE 31    /* Tamanho da struct veiculo_data  se "modelo" e "categoria" tiverem tamanho 0 e sem contar o campo "removido" */
+                                        /* Usado para calcular o tamanho do registro */
 
 /**
  * Struct para armazenar um registro de dados por vez
