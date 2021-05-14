@@ -5,6 +5,7 @@
  */
 
 #include <veiculo_read.h>
+#include <linha_read.h>
 #include <comandos.h>
 #include <util.h>
 #include <main.h>
@@ -15,7 +16,7 @@
 void comando_1()
 {
     /**
-     * Comando 1 usado para ler um arquivo csv e gerar um arquivo binario
+     * Comando 1 usado para ler um arquivo csv veiculo e gerar um arquivo binario veiculo
     */
     char *fileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
     scanf("%s", fileName);
@@ -25,6 +26,26 @@ void comando_1()
     veiculo_file *file = read_csv_veiculo_file(fileName, binaryFileName);
     close_binary_veiculo_file(file);
     binarioNaTela(binaryFileName);
+
+    free(fileName);
+    free(binaryFileName);
+}
+
+void comando_2()
+{
+    /**
+     * Comando 2 usado para ler um arquivo csv linha e gerar um arquivo binario linha
+    */
+
+    char *fileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s", fileName);
+
+    char *binaryFileName = generate_bin_filename(fileName);
+
+    linha_file *file = read_csv_linha_file(fileName, binaryFileName);
+    close_binary_linha_file(file);
+    binarioNaTela(binaryFileName);
+
     free(fileName);
     free(binaryFileName);
 }

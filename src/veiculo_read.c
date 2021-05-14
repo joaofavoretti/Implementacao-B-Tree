@@ -43,7 +43,7 @@ veiculo_header *read_csv_veiculo_header(FILE *csvFilePointer, FILE *binFilePoint
 {
     /**
      * Funcao para ler a primeira linha do arquivo Csv.
-     * Coloca csvFilePointer no primeiro caracetere da segunda linha
+     * Coloca csvFilePointer no primeiro caractere da segunda linha
      * 
      * @param csvFilePointer Ponteiro aberto para o arquivo CSV
      * @param binFilePointer Ponteiro aberto para o arquivo binario de veiculos
@@ -64,16 +64,16 @@ veiculo_header *read_csv_veiculo_header(FILE *csvFilePointer, FILE *binFilePoint
         header->descreveCategoria);
     
     header->status = '0';                           /* Setar campo para arquivo "sujo" */
-    header->byteProxReg = VEICULO_HEADER_SIZE + 1;  /* Setar o campo */
+    header->byteProxReg = VEICULO_HEADER_SIZE;  /* Setar o campo */
 
     #ifdef DEBUG
-    print_header(header); 
+    print__veiculo_header(header); 
     #endif
 
     /* Escrevendo informacoes lidas no arquivo binario */
     update_binary_veiculo_header(header, binFilePointer);
 
-    /* Retorno de uma struct_header contendo o arquivo lido */
+    /* Retorno de uma struct veiculo_header contendo o arquivo lido */
     return header;
 }
 
@@ -122,7 +122,7 @@ veiculo_data *read_csv_veiculo_data(veiculo_header *header, FILE *csvFilePointer
     char tempCodLinha[64];
 
     /* Posicionar cursor no byte depois do cabecalho */
-    fseek(binFilePointer, VEICULO_HEADER_SIZE + 1, SEEK_SET);
+    fseek(binFilePointer, VEICULO_HEADER_SIZE, SEEK_SET);
 
     while((tempRemovido = getc(csvFilePointer)) != EOF) {
 
@@ -175,7 +175,7 @@ veiculo_data *read_csv_veiculo_data(veiculo_header *header, FILE *csvFilePointer
         data->tamanhoRegistro = VEICULO_DATA_DEFAULT_SIZE + data->tamanhoModelo + data->tamanhoCategoria;
 
         #ifdef DEBUG
-        print_data(data);
+        print__veiculo_data(data);
         #endif
 
         /* Escreve informação no arquivo binario */
@@ -215,7 +215,7 @@ void close_binary_veiculo_file(veiculo_file* file)
     update_binary_veiculo_header(file->header, file->fp);
 
     #ifdef DEBUG
-    print_header(file->header);
+    print__veiculo_header(file->header);
     #endif
 
     

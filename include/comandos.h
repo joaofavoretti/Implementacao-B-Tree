@@ -8,5 +8,6 @@
 #define _COMANDOS_H_
 
 void comando_1();
+void comando_2();
 
 #endif
