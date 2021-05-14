@@ -1,10 +1,10 @@
 # Trabalho Prático 1 - Organizacao de Arquivos
 # Nome: João Pedro Favoretti (11316055)
-# Nome:
+# Nome: Lucas Pilla (10633328)
 
 CC = gcc
 MAIN = main.c
-PROG = tests/main
+PROG = main
 FUNCTIONS = src/*.c funcao-fornecida.c
 INCLUDE = include
 

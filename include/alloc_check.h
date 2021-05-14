@@ -1,7 +1,7 @@
 /**
  * Trabalho Prático 1 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
- * Nome:
+ * Nome: Lucas Pilla (10633328)
  */
 
 #ifndef _ALLOC_CHECK_H_
@@ -12,6 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void alloc_check(void *data_pointer);
+void alloc_check(void *data_pointer, char *message);
 
 #endif

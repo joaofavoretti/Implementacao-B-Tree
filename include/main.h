@@ -1,7 +1,7 @@
 /**
  * Trabalho Prático 1 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
- * Nome:
+ * Nome: Lucas Pilla (10633328)
  */
 
 #ifndef _MAIN_H_
