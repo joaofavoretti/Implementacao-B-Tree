@@ -8,7 +8,9 @@
 #define _READ_BINARY_H_
 
 #include <veiculo_read.h>
+#include <linha_read.h>
 
-veiculo_header *read_binary_header(FILE *binFilePointer);
+veiculo_header *read_binary_veiculo_header(FILE *binFilePointer);
+linha_header *read_binary_linha_header(FILE *binFilePointer);
 
 #endif
