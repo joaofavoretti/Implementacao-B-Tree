@@ -10,5 +10,6 @@
 void comando_1();
 void comando_2();
 void comando_7();
+void comando_8();
 
 #endif

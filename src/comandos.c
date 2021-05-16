@@ -70,7 +70,7 @@ void comando_7()
     file->fp = fopen(binFileName, "r+");
     alloc_check(file->fp, "Falha no processamento do arquivo.\n");
 
-    file->header = read_binary_header(file->fp);
+    file->header = read_binary_veiculo_header(file->fp);
     #ifdef DEBUG
     print__veiculo_header(file->header);
     #endif
@@ -78,6 +78,35 @@ void comando_7()
     file->data = read_stdin_veiculo_data(n, file->header, file->fp);
 
     close_binary_veiculo_file(file);
+    binarioNaTela(binFileName);
+
+    free(binFileName);
+}
+
+void comando_8()
+{
+    /**
+     * Comando 8 Usado para ler entradas da entrada padrao e escrever no arquivo binario de linha
+    */
+
+    int n;
+    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s %d", binFileName, &n);
+
+    linha_file *file = (linha_file *)calloc(sizeof(linha_file), 1 * sizeof(linha_file));
+    alloc_check(file, "Falha no processamento do arquivo.\n");
+
+    file->fp = fopen(binFileName, "r+");
+    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+
+    file->header = read_binary_linha_header(file->fp);
+    #ifdef DEBUG
+    print__linha_header(file->header);
+    #endif
+
+    file->data = read_stdin_linha_data(n, file->header, file->fp);
+
+    close_binary_linha_file(file);
     binarioNaTela(binFileName);
 
     free(binFileName);

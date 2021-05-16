@@ -9,6 +9,7 @@
 #include <close_binary.h>
 #include <is_null_field.h>
 #include <alloc_check.h>
+#include <main.h>
 #include <util.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,7 +120,7 @@ linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer, FILE
 
         /* Checa por campos com valores "NULO" */
         if (is_null_field(tempAceitaCartao)) {
-            memcpy(&data->aceitaCartao, "N", 1);
+            memcpy(&data->aceitaCartao, "\0", 1);
         } else {
             memcpy(&data->aceitaCartao, tempAceitaCartao, 1);
         }
@@ -148,5 +149,65 @@ linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer, FILE
     }
     
     /* Retorna a struct data com as ultimas informacoes armazenadas */
+    return data;
+}
+
+linha_data *read_stdin_linha_data(int nOfEntries, linha_header *header, FILE *binFilePointer)
+{
+    /**
+     * Funcao para ler nOfEntries da entrada padrao e escrever no lugar do proximo registro do arquivo binario de linha
+     * 
+     * @param nOfEntries Numero de entradas que vao ser colocadas na entrada padrao
+     * @param header Estrutura armazenando o cabecalho do arquivo binario do linha
+     * @param binFilePointer Ponteiro aberto para o arquivo binario de linha
+    */
+
+    linha_data *data = (linha_data *)calloc(sizeof(linha_data), 1 * sizeof(linha_data));
+    alloc_check(data, "struct linha_data não alocado com sucesso\n");
+
+    char tempCodLinha[64];
+    char tempAceitaCartao[64];
+
+    for (int i = 0; i < nOfEntries; i++) {
+        data->removido = '1';       /* Setar o registro como não removido */
+        header->nroRegistros += 1;  /* Incrementar o numero de registros do arquivo */
+
+        /* Le as entradas do usuario como string */
+        /* A funcao scan_quote_string retorna o valor "" quando encontra NULO */
+        scanf("%s ", tempCodLinha);
+        scan_quote_string(tempAceitaCartao);
+        scan_quote_string(data->nomeLinha);
+        scan_quote_string(data->corLinha);
+
+        /* Checa por campos com valores "NULO" */
+        /* Como a funcao scan_quote_string ja retorna o campo como "" caso seja nulo, não precisa checar a string nesses campos */
+        if (strlen(tempAceitaCartao) == 0) {
+            memcpy(&data->aceitaCartao, "\0", 1);
+        } else {
+            memcpy(&data->aceitaCartao, tempAceitaCartao, 1);
+        }
+
+        data->tamanhoNome = strlen(data->nomeLinha);
+
+        data->tamanhoCor = strlen(data->corLinha);
+
+        /* Lida com campos de valor inteiro */
+        /* Precisamos checar porque não lemos esses campos com a funcao scan_quote_string */
+        if(is_null_field(tempCodLinha)) {
+            data->codLinha = -1;
+        } else {
+            data->codLinha = atoi(tempCodLinha);
+        }
+
+        data->tamanhoRegistro = LINHA_DATA_DEFAULT_SIZE + data->tamanhoNome + data->tamanhoCor;
+
+        #ifdef DEBUG
+        print__linha_data(data);
+        #endif
+
+        /* Escreve informação no arquivo binario */
+        append_binary_linha_data (header, data, binFilePointer);
+    }
+
     return data;
 }

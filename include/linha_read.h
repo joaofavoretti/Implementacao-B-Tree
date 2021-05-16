@@ -58,5 +58,6 @@ typedef struct {
 linha_file *read_csv_linha_file (char *csvFileName, char *binFileName);
 linha_header *read_csv_linha_header(FILE *csvFilePointer, FILE *binFilePointer);
 linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer, FILE *binFilePointer);
+linha_data *read_stdin_linha_data(int nOfEntries, linha_header *header, FILE *binFilePointer);
 
 #endif
