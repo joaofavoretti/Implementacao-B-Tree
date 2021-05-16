@@ -12,6 +12,13 @@
 
 veiculo_header *read_binary_header(FILE *binFilePointer)
 {
+    /**
+     * Funcao para ler o header do binario fornecido por parametro.
+     * Posiciona o cursor na posicao 0 do arquivo para realizar a leitura. Apos a leitura, posiciona o cursor no primeiro byte do primeiro registro.
+     * 
+     * @param binFilePointer Ponteiro aberto para o arquivo binario do veiculo
+     */
+
     veiculo_header *header = (veiculo_header *)calloc(sizeof(veiculo_header), 1 * sizeof(veiculo_header));
     alloc_check(header, "struct veiculo_header não foi alocado com sucesso\n");
 

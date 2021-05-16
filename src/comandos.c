@@ -59,15 +59,16 @@ void comando_7()
     /**
      * Comando 7 Usado para ler entradas da entrada padrao e escrever no arquivo binario de veiculo
     */
+
     int n;
     char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
     scanf("%s %d", binFileName, &n);
 
     veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
-    alloc_check(file, "Falha no processamento do arquivo.");
+    alloc_check(file, "Falha no processamento do arquivo.\n");
 
     file->fp = fopen(binFileName, "r+");
-    alloc_check(file->fp, "Falha no processamento do arquivo.");
+    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
 
     file->header = read_binary_header(file->fp);
     #ifdef DEBUG

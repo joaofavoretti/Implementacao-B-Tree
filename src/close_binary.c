@@ -12,6 +12,14 @@
 
 void close_binary_veiculo_file(veiculo_file* file)
 {
+    /**
+     * Funcao usada para fechar o arquivo binario do veiculo. 
+     * Atualiza o status do header para '1'
+     * Atualiza o header com as informacoes que foram adicionadas durante o programa
+     * 
+     * @param file estrutura do arquivo de veiculo salva em RAM que deve ser fechada
+     */
+
     /* Colocar o status do arquivo como "limpo" e atualizar o cabecalho do arquivo antes de fechar */
     file->header->status = '1';
     update_binary_veiculo_header(file->header, file->fp);
@@ -28,6 +36,14 @@ void close_binary_veiculo_file(veiculo_file* file)
 
 void close_binary_linha_file(linha_file* file)
 {
+    /**
+     * Funcao usada para fechar o arquivo binario do linha. 
+     * Atualiza o status do header para '1'
+     * Atualiza o header com as informacoes que foram adicionadas durante o programa
+     * 
+     * @param file estrutura do arquivo de linha salva em RAM que deve ser fechada
+     */
+
     /* Colocar o status do arquivo como "limpo" e atualizar o cabecalho do arquivo antes de fechar */
     file->header->status = '1';
     update_binary_linha_header(file->header, file->fp);

@@ -162,15 +162,23 @@ veiculo_data *read_csv_veiculo_data(veiculo_header *header, FILE *csvFilePointer
     return data;
 }
 
-veiculo_data *read_stdin_veiculo_data(int nEntries, veiculo_header *header, FILE *binFilePointer)
+veiculo_data *read_stdin_veiculo_data(int nOfEntries, veiculo_header *header, FILE *binFilePointer)
 {
+    /**
+     * Funcao para ler nOfEntries da entrada padrao e escrever no lugar do proximo registro do arquivo binario
+     * 
+     * @param nOfEntries Numero de entradas que vao ser colocadas na entrada padrao
+     * @param header Estrutura armazenando o cabecalho do arquivo binario do veiculo
+     * @param binFilePointer Ponteiro aberto para o arquivo binario do veiculo
+    */
+
     veiculo_data *data = (veiculo_data *)calloc(sizeof(veiculo_data), 1 * sizeof(veiculo_data));
     alloc_check(data, "struct veiculo_data não alocado com sucesso\n");
 
     char tempQuantidadeLugares[64];
     char tempCodLinha[64];
 
-    for (int i = 0; i < nEntries; i++) {
+    for (int i = 0; i < nOfEntries; i++) {
         data->removido = '1';       /* Setar o registro como não removido */
         header->nroRegistros += 1;  /* Incrementar o numero de registros do arquivo */
 
