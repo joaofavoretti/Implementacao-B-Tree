@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
             break;
             
         case 7:
+            comando_7();
             break;
             
         case 8:

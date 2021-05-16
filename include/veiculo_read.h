@@ -64,5 +64,6 @@ typedef struct {
 veiculo_file *read_csv_veiculo_file (char *csvFileName, char *binFileName);
 veiculo_header *read_csv_veiculo_header(FILE *csvFilePointer, FILE *binFilePointer);
 veiculo_data *read_csv_veiculo_data(veiculo_header *header, FILE *csvFilePointer, FILE *binFilePointer);
+veiculo_data *read_stdin_veiculo_data(int nEntries, veiculo_header *header, FILE *binFilePointer);
 
 #endif
