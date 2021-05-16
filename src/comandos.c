@@ -7,7 +7,9 @@
 #include <veiculo_read.h>
 #include <linha_read.h>
 #include <write_binary.h>
+#include <read_binary.h>
 #include <close_binary.h>
+#include <alloc_check.h>
 #include <comandos.h>
 #include <util.h>
 #include <main.h>
@@ -50,4 +52,32 @@ void comando_2()
 
     free(fileName);
     free(binaryFileName);
+}
+
+void comando_7()
+{
+    /**
+     * Comando 7 Usado para ler entradas da entrada padrao e escrever no arquivo binario de veiculo
+    */
+    int n;
+    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s %d", binFileName, &n);
+
+    veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
+    alloc_check(file, "Falha no processamento do arquivo.");
+
+    file->fp = fopen(binFileName, "r+");
+    alloc_check(file->fp, "Falha no processamento do arquivo.");
+
+    file->header = read_binary_header(file->fp);
+    #ifdef DEBUG
+    print__veiculo_header(file->header);
+    #endif
+
+    file->data = read_stdin_veiculo_data(n, file->header, file->fp);
+
+    close_binary_veiculo_file(file);
+    binarioNaTela(binFileName);
+
+    free(binFileName);
 }

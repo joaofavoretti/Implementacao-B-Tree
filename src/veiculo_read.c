@@ -9,6 +9,7 @@
 #include <close_binary.h>
 #include <is_null_field.h>
 #include <alloc_check.h>
+#include <main.h>
 #include <util.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,5 +159,63 @@ veiculo_data *read_csv_veiculo_data(veiculo_header *header, FILE *csvFilePointer
     }
     
     /* Retorna a struct data com as ultimas informacoes armazenadas */
+    return data;
+}
+
+veiculo_data *read_stdin_veiculo_data(int nEntries, veiculo_header *header, FILE *binFilePointer)
+{
+    veiculo_data *data = (veiculo_data *)calloc(sizeof(veiculo_data), 1 * sizeof(veiculo_data));
+    alloc_check(data, "struct veiculo_data não alocado com sucesso\n");
+
+    char tempQuantidadeLugares[64];
+    char tempCodLinha[64];
+
+    for (int i = 0; i < nEntries; i++) {
+        data->removido = '1';       /* Setar o registro como não removido */
+        header->nroRegistros += 1;  /* Incrementar o numero de registros do arquivo */
+
+        /* Le as entradas do usuario como string */
+        /* A funcao scan_quote_string retorna o valor "" quando encontra NULO */
+        scan_quote_string(data->prefixo);
+        scan_quote_string(data->data);
+        scanf("%s ", tempQuantidadeLugares);
+        scanf("%s ", tempCodLinha);
+        scan_quote_string(data->modelo);
+        scan_quote_string(data->categoria);
+
+        /* Checa por campos com valores "NULO" */
+        /* Como a funcao scan_quote_string ja retorna o campo como "" caso seja nulo, não precisa checar a string nesses campos */
+        if (strlen(data->data) == 0) {
+            memcpy(data->data, "\0@@@@@@@@@", 10);
+        }
+
+        data->tamanhoModelo = strlen(data->modelo);
+
+        data->tamanhoCategoria = strlen(data->categoria);
+
+        /* Lida com campos de valor inteiro */
+        /* Precisamos checar porque não lemos esses campos com a funcao scan_quote_string */
+        if (is_null_field(tempQuantidadeLugares)) {
+            data->quantidadeLugares = -1;
+        } else {
+            data->quantidadeLugares = atoi(tempQuantidadeLugares);
+        }
+
+        if(is_null_field(tempCodLinha)) {
+            data->codLinha = -1;
+        } else {
+            data->codLinha = atoi(tempCodLinha);
+        }
+
+        data->tamanhoRegistro = VEICULO_DATA_DEFAULT_SIZE + data->tamanhoModelo + data->tamanhoCategoria;
+
+        #ifdef DEBUG
+        print__veiculo_data(data);
+        #endif
+
+        /* Escreve informação no arquivo binario */
+        append_binary_veiculo_data (header, data, binFilePointer);
+    }
+
     return data;
 }
