@@ -57,9 +57,6 @@ typedef struct {
 
 linha_file *read_csv_linha_file (char *csvFileName, char *binFileName);
 linha_header *read_csv_linha_header(FILE *csvFilePointer, FILE *binFilePointer);
-void update_binary_linha_header(linha_header *header, FILE *binFilePointer);
 linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer, FILE *binFilePointer);
-void append_binary_linha_data (linha_header *header, linha_data *data, FILE *binFilePointer);
-void close_binary_linha_file(linha_file* file);
 
 #endif

@@ -6,6 +6,8 @@
 
 #include <veiculo_read.h>
 #include <linha_read.h>
+#include <write_binary.h>
+#include <close_binary.h>
 #include <comandos.h>
 #include <util.h>
 #include <main.h>
