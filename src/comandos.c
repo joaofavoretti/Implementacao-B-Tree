@@ -87,6 +87,38 @@ void comando_3()
     free(binFileName);
 }
 
+void comando_4(){
+    /*
+     *  Comando 4 usado para mostrar os dados de forma organizada dos registros em 'linha.bin'
+     */
+
+    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s", binFileName);
+
+    linha_file *file = (linha_file *)calloc(sizeof(linha_file), 1 * sizeof(linha_file));
+    alloc_check(file, "Falha no processamento do arquivo.\n");
+
+    file->fp = fopen(binFileName, "r");
+    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+
+    file->header = read_binary_linha_header(file->fp);
+
+    for(int i = 0; i < file->header->nroRegistros; i++)
+    {
+        linha_data *data = read_binary_linha_data(file->header, file->fp);
+        if(data->removido == '1') {
+            print_linha_data(file->header, data);
+            printf("\n");
+        } else {
+            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+        }
+        free(data);
+    }
+
+    close_binary_linha_file(file);
+    free(binFileName);
+}
+
 void comando_7()
 {
     /**

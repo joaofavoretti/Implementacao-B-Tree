@@ -14,5 +14,6 @@ veiculo_header *read_binary_veiculo_header(FILE *binFilePointer);
 veiculo_data *read_binary_veiculo_data(veiculo_header *header, FILE *binFilePointer);
 
 linha_header *read_binary_linha_header(FILE *binFilePointer);
+linha_data *read_binary_linha_data(linha_header *header, FILE *binFilePointer);
 
 #endif

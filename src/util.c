@@ -121,7 +121,7 @@ void print__linha_data(linha_data *data)
     return;
 }
 
-void print_veiculo_field(char *descriptor, char *value){
+void print_field(char *descriptor, char *value){
     printf("%s: ", descriptor);
     if(strlen(value) == 0)
         printf("campo com valor nulo\n");
@@ -132,11 +132,30 @@ void print_veiculo_field(char *descriptor, char *value){
 void print_veiculo_data(veiculo_header *header, veiculo_data *data)
 {
     printf("%s: %s\n", header->descrevePrefixo, data->prefixo);
-    print_veiculo_field(header->descreveCategoria, data->categoria);
-    print_veiculo_field(header->descreveData, data->data);
+    print_field(header->descreveModelo, data->modelo);
+    print_field(header->descreveCategoria, data->categoria);
+    print_field(header->descreveData, data->data);
     char str[11];
     sprintf(str, "%d", data->quantidadeLugares);
-    print_veiculo_field(header->descreveLugares, str);
+    print_field(header->descreveLugares, str);
 }
 
+
+void print_linha_data(linha_header *header, linha_data *data){
+    printf("%s: %d\n", header->descreveCodigo, data->codLinha);
+    print_field(header->descreveNome, data->nomeLinha);
+    print_field(header->descreveCor, data->corLinha);
+
+    printf("%s: ", header->descreveCor);
+    if(data->aceitaCartao == 'S'){
+        printf("PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR\n");
+    } else if(data->aceitaCartao == 'N') {
+        printf("PAGAMENTO EM CARTAO E DINHEIRO\n");
+    } else if(data->aceitaCartao == 'F') {
+        printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
+    } else {
+        printf("campo com valor nulo\n");
+    }
+
+}
 

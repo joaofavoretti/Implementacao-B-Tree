@@ -46,7 +46,7 @@ veiculo_data *read_binary_veiculo_data(veiculo_header *header, FILE *binFilePoin
      */
 
     veiculo_data *data = (veiculo_data *)calloc(1, sizeof(veiculo_data));
-    alloc_check(header, "struct veiculo_header não foi alocado com sucesso\n");
+    alloc_check(header, "struct veiculo_data não foi alocado com sucesso\n");
 
     fread(&data->removido, sizeof(char), 1, binFilePointer);
     fread(&data->tamanhoRegistro, sizeof(int), 1, binFilePointer);
@@ -91,4 +91,31 @@ linha_header *read_binary_linha_header(FILE *binFilePointer)
     fread(header->descreveCor, sizeof(char), 24, binFilePointer);
 
     return header;
+}
+
+linha_data *read_binary_linha_data(linha_header *header, FILE *binFilePointer)
+{
+    /*
+     *  Função para ler um registro do binario fornecido por parametro
+     *  Retorna uma struct com os dados do registro
+     */
+
+    linha_data *data = (linha_data *)calloc(1, sizeof(linha_data));
+    alloc_check(header, "struct linha_data não foi alocado com sucesso\n");
+    
+    fread(&data->removido, sizeof(char), 1, binFilePointer);
+    fread(&data->tamanhoRegistro, sizeof(int), 1, binFilePointer);
+
+    //Verifica se o registro esta logicamente removido
+    if(data->removido == '0')
+        return data;
+
+    fread(&data->codLinha, sizeof(int), 1, binFilePointer);
+    fread(&data->aceitaCartao, sizeof(char), 1, binFilePointer);
+    fread(&data->tamanhoNome, sizeof(int), 1, binFilePointer);
+    fread(data->nomeLinha, sizeof(char), data->tamanhoNome, binFilePointer);
+    fread(&data->tamanhoCor, sizeof(int), 1, binFilePointer);
+    fread(data->corLinha, sizeof(char), data->tamanhoCor, binFilePointer);
+
+    return data;
 }
