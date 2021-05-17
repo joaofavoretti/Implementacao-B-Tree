@@ -11,6 +11,8 @@
 #include <linha_read.h>
 
 veiculo_header *read_binary_veiculo_header(FILE *binFilePointer);
+veiculo_data *read_binary_veiculo_data(veiculo_header *header, FILE *binFilePointer);
+
 linha_header *read_binary_linha_header(FILE *binFilePointer);
 
 #endif

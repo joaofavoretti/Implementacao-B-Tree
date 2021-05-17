@@ -54,6 +54,39 @@ void comando_2()
     free(binaryFileName);
 }
 
+void comando_3()
+{
+    /*
+     *  Comando 3 usado para mostrar os dados de forma organizada dos registros em 'veiculo.bin'
+     */
+
+    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s", binFileName);
+
+    veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
+    alloc_check(file, "Falha no processamento do arquivo.\n");
+
+    file->fp = fopen(binFileName, "r");
+    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+
+    file->header = read_binary_veiculo_header(file->fp);
+
+    for(int i = 0; i < file->header->nroRegistros; i++)
+    {
+        veiculo_data *data = read_binary_veiculo_data(file->header, file->fp);
+        if(data->removido == '1') {
+            print_veiculo_data(file->header, data);
+            printf("\n");
+        } else {
+            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+        }
+        free(data);
+    }
+
+    close_binary_veiculo_file(file);
+    free(binFileName);
+}
+
 void comando_7()
 {
     /**
