@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
             break;
             
         case 3:
+            comando_3();
             break;
             
         case 4:

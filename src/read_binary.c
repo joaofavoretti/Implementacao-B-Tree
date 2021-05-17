@@ -38,6 +38,35 @@ veiculo_header *read_binary_veiculo_header(FILE *binFilePointer)
     return header;
 }
 
+veiculo_data *read_binary_veiculo_data(veiculo_header *header, FILE *binFilePointer)
+{
+    /*
+     *  Função para ler um registro do binario fornecido por parametro
+     *  Retorna uma struct com os dados do registro
+     */
+
+    veiculo_data *data = (veiculo_data *)calloc(1, sizeof(veiculo_data));
+    alloc_check(header, "struct veiculo_header não foi alocado com sucesso\n");
+
+    fread(&data->removido, sizeof(char), 1, binFilePointer);
+    fread(&data->tamanhoRegistro, sizeof(int), 1, binFilePointer);
+
+    //Verifica se o registro esta logicamente removido
+    if(data->removido == '0')
+        return data;
+
+    fread(data->prefixo, sizeof(char), 5, binFilePointer);
+    fread(data->data, sizeof(char), 10, binFilePointer);
+    fread(&data->quantidadeLugares, sizeof(int), 1, binFilePointer);
+    fread(&data->codLinha, sizeof(int), 1, binFilePointer);
+    fread(&data->tamanhoModelo, sizeof(int), 1, binFilePointer);
+    fread(data->modelo, sizeof(char), data->tamanhoModelo, binFilePointer);
+    fread(&data->tamanhoCategoria, sizeof(int), 1, binFilePointer);
+    fread(data->categoria, sizeof(char), data->tamanhoCategoria, binFilePointer);
+    
+    return data;
+}
+
 linha_header *read_binary_linha_header(FILE *binFilePointer)
 {
     /**

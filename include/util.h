@@ -6,6 +6,7 @@
 
 #include <veiculo_read.h>
 #include <linha_read.h>
+#include <stdlib.h>
 
 #ifndef _UTIL_H_
 #define _UTIL_H_
@@ -15,5 +16,7 @@ void print__veiculo_data(veiculo_data *data);
 void print__linha_header(linha_header *header);
 void print__linha_data(linha_data *data);
 char *generate_bin_filename(char *fileName);
+
+void print_veiculo_data(veiculo_header *header, veiculo_data *data);
 
 #endif

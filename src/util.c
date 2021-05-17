@@ -120,3 +120,23 @@ void print__linha_data(linha_data *data)
 
     return;
 }
+
+void print_veiculo_field(char *descriptor, char *value){
+    printf("%s: ", descriptor);
+    if(strlen(value) == 0)
+        printf("campo com valor nulo\n");
+    else
+        printf("%s\n", value);
+}
+
+void print_veiculo_data(veiculo_header *header, veiculo_data *data)
+{
+    printf("%s: %s\n", header->descrevePrefixo, data->prefixo);
+    print_veiculo_field(header->descreveCategoria, data->categoria);
+    print_veiculo_field(header->descreveData, data->data);
+    char str[11];
+    sprintf(str, "%d", data->quantidadeLugares);
+    print_veiculo_field(header->descreveLugares, str);
+}
+
+
