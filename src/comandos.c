@@ -119,6 +119,90 @@ void comando_4(){
     free(binFileName);
 }
 
+void comando_5()
+{
+     /*
+     *  Comando 5 usado para mostrar resgistros de 'veiculo.bin' com base no criterio de busca
+     */
+
+    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s", binFileName);
+
+    char fieldName[18];
+    scanf("%s", fieldName);
+
+    char fieldValue[128];
+    scan_quote_string(fieldValue);
+
+    veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
+    alloc_check(file, "Falha no processamento do arquivo.\n");
+
+    file->fp = fopen(binFileName, "r");
+    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+
+    file->header = read_binary_veiculo_header(file->fp);
+
+    for(int i = 0; i < file->header->nroRegistros; i++)
+    {
+        veiculo_data *data = read_binary_veiculo_data(file->header, file->fp);
+
+        if( data->removido == '1' && fieldcmp_veiculo(fieldValue, fieldName, data) == 0) {
+            print_veiculo_data(file->header, data);
+            printf("\n");
+
+        } else if(data->removido == '0') {
+            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+        }
+
+        free(data);
+    }
+
+    close_binary_veiculo_file(file);
+    free(binFileName);
+}
+
+void comando_6()
+{
+     /*
+     *  Comando 6 usado para mostrar resgistros de 'linha.bin' com base no criterio de busca
+     */
+
+    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    scanf("%s", binFileName);
+
+    char fieldName[18];
+    scanf("%s", fieldName);
+
+    char fieldValue[128];
+    scan_quote_string(fieldValue);
+
+    linha_file *file = (linha_file *)calloc(sizeof(linha_file), 1 * sizeof(linha_file));
+    alloc_check(file, "Falha no processamento do arquivo.\n");
+
+    file->fp = fopen(binFileName, "r");
+    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+
+    file->header = read_binary_linha_header(file->fp);
+
+    for(int i = 0; i < file->header->nroRegistros; i++)
+    {
+        linha_data *data = read_binary_linha_data(file->header, file->fp);
+
+        if( data->removido == '1' && fieldcmp_linha(fieldValue, fieldName, data) == 0) {
+            print_linha_data(file->header, data);
+            printf("\n");
+            
+        } else if(data->removido == '0') {
+            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+        }
+
+        free(data);
+    }
+
+    close_binary_linha_file(file);
+    free(binFileName);
+}
+
 void comando_7()
 {
     /**

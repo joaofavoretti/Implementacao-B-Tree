@@ -29,9 +29,11 @@ int main(int argc, char **argv) {
             break;
             
         case 5:
+            comando_5();
             break;
             
         case 6:
+            comando_6();
             break;
             
         case 7:
