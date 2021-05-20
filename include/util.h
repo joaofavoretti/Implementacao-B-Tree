@@ -18,5 +18,6 @@ void print__linha_data(linha_data *data);
 char *generate_bin_filename(char *fileName);
 
 void print_veiculo_data(veiculo_header *header, veiculo_data *data);
+void print_linha_data(linha_header *header, linha_data *data);
 
 #endif
