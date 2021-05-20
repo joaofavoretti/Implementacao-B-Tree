@@ -11,6 +11,8 @@ void comando_1();
 void comando_2();
 void comando_3();
 void comando_4();
+void comando_5();
+void comando_6();
 void comando_7();
 void comando_8();
 

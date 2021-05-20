@@ -159,3 +159,38 @@ void print_linha_data(linha_header *header, linha_data *data){
 
 }
 
+int fieldcmp_veiculo(char *fieldValue, char *fieldName, veiculo_data *data){
+    char *aux = NULL;
+
+    if(strcmp("prefixo", fieldName) == 0) {
+        aux = data->prefixo;
+    } else if(strcmp("data", fieldName) == 0) {
+        aux = data->data;
+    } else if(strcmp("modelo", fieldName) == 0) {
+        aux = data->modelo;
+    } else if(strcmp("categoria", fieldName) == 0) {
+        aux = data->categoria;
+    } else if(strcmp("quantidadeLugares", fieldName) == 0) {
+        return data->quantidadeLugares != atoi(fieldValue);
+    }
+
+    return strcmp(aux, fieldValue);
+}
+
+int fieldcmp_linha(char *fieldValue, char *fieldName, linha_data *data){
+    char *aux = NULL;
+
+    if(strcmp("aceitaCartao", fieldName) == 0) {
+        return data->aceitaCartao != fieldValue[0];
+    } else if(strcmp("nomeLinha", fieldName) == 0) {
+        aux = data->nomeLinha;
+    } else if(strcmp("corLinha", fieldName) == 0) {
+        aux = data->corLinha;
+    } else if(strcmp("codLinha", fieldName) == 0) {
+        return data->codLinha != atoi(fieldValue);
+    }
+
+    return strcmp(aux, fieldValue);
+}
+
+
