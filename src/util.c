@@ -5,6 +5,7 @@
  */
 
 #include <util.h>
+#include <alloc_check.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -121,6 +122,34 @@ void print__linha_data(linha_data *data)
     return;
 }
 
+char *format_data_field(char *data) {
+    /**
+     * Funcao para formatar string de data no formato AAAA-MM-DD
+     * retorna funcao alocada dinamicamente com a string formatada;
+    */
+    char meses[][16] = {"janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"};
+
+    char *dataFormatada = (char *)calloc(sizeof(char), 64 * sizeof(char));
+    alloc_check(dataFormatada, "Erro ao alocar memoria para dataFormatada");
+
+    char *dataMes = (char *)calloc(sizeof(char), 8 * sizeof(char));
+    alloc_check(dataMes, "Erro ao alocar memoria para dataMes");
+
+    /* Calcula o indice o mes para o vetor meses. Considera que a representacao do mes esteja entre '1' e '12' */
+    strncpy(dataMes, &data[6], 2);
+    int numeroMes = atoi(dataMes) - 1;
+
+    /* Concatena as informacoes para o formato ideal do mês */
+    strncpy(dataFormatada, &data[8], 2);
+    strncpy(&dataFormatada[2], " de ", 4);
+    strncpy(&dataFormatada[6], meses[numeroMes], strlen(meses[numeroMes]));
+    strncpy(&dataFormatada[strlen(dataFormatada)], " de ", 4);
+    strncpy(&dataFormatada[strlen(dataFormatada)], &data[0], 4);
+
+    free(dataMes);
+    return dataFormatada;
+}
+
 void print_field(char *descriptor, char *value){
     printf("%s: ", descriptor);
     if(strlen(value) == 0)
@@ -134,7 +163,15 @@ void print_veiculo_data(veiculo_header *header, veiculo_data *data)
     printf("%s: %s\n", header->descrevePrefixo, data->prefixo);
     print_field(header->descreveModelo, data->modelo);
     print_field(header->descreveCategoria, data->categoria);
-    print_field(header->descreveData, data->data);
+
+    if (strlen(data->data)) {
+        char *dataFormatada = format_data_field(data->data);
+        print_field(header->descreveData, dataFormatada);
+        free(dataFormatada);
+    }  else {
+        print_field(header->descreveData, data->data);
+    }
+
     char str[11];
     sprintf(str, "%d", data->quantidadeLugares);
     print_field(header->descreveLugares, str);
