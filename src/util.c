@@ -127,7 +127,7 @@ char *format_data_field(char *data) {
      * Funcao para formatar string de data no formato AAAA-MM-DD
      * retorna funcao alocada dinamicamente com a string formatada;
     */
-    char meses[][16] = {"janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"};
+    char meses[][16] = {"janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"};
 
     char *dataFormatada = (char *)calloc(sizeof(char), 64 * sizeof(char));
     alloc_check(dataFormatada, "Erro ao alocar memoria para dataFormatada");
@@ -136,7 +136,7 @@ char *format_data_field(char *data) {
     alloc_check(dataMes, "Erro ao alocar memoria para dataMes");
 
     /* Calcula o indice o mes para o vetor meses. Considera que a representacao do mes esteja entre '1' e '12' */
-    strncpy(dataMes, &data[6], 2);
+    strncpy(dataMes, &data[5], 2);
     int numeroMes = atoi(dataMes) - 1;
 
     /* Concatena as informacoes para o formato ideal do mês */
@@ -183,7 +183,7 @@ void print_linha_data(linha_header *header, linha_data *data){
     print_field(header->descreveNome, data->nomeLinha);
     print_field(header->descreveCor, data->corLinha);
 
-    printf("%s: ", header->descreveCor);
+    printf("%s: ", header->descreveCartao);
     if(data->aceitaCartao == 'S'){
         printf("PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR\n");
     } else if(data->aceitaCartao == 'N') {
