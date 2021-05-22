@@ -7,7 +7,7 @@
 #ifndef _ALLOC_CHECK_H_
 #define _ALLOC_CHECK_H_
 
-#define ALLOC_NULL_POINTER -2
+#define ALLOC_NULL_POINTER 0
 
 #include <stdio.h>
 #include <stdlib.h>

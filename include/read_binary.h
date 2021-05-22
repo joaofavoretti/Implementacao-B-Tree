@@ -10,6 +10,8 @@
 #include <veiculo_read.h>
 #include <linha_read.h>
 
+#define FAIL_BINARY_STATUS 0
+
 veiculo_header *read_binary_veiculo_header(FILE *binFilePointer);
 veiculo_data *read_binary_veiculo_data(veiculo_header *header, FILE *binFilePointer);
 

@@ -25,6 +25,12 @@ veiculo_header *read_binary_veiculo_header(FILE *binFilePointer)
     fseek(binFilePointer, 0, SEEK_SET);
 
     fread(&header->status, sizeof(char), 1, binFilePointer);
+
+    if (header->status == '0') {
+        printf("Falha no processamento do arquivo.\n");
+        exit(FAIL_BINARY_STATUS);
+    }
+
     fread(&header->byteProxReg, sizeof(long long int), 1, binFilePointer);
     fread(&header->nroRegistros, sizeof(int), 1, binFilePointer);
     fread(&header->nroRegRemovidos, sizeof(int), 1, binFilePointer);
@@ -82,6 +88,12 @@ linha_header *read_binary_linha_header(FILE *binFilePointer)
     fseek(binFilePointer, 0, SEEK_SET);
 
     fread(&header->status, sizeof(char), 1, binFilePointer);
+
+    if (header->status == '0') {
+        printf("Falha no processamento do arquivo.\n");
+        exit(FAIL_BINARY_STATUS);
+    }
+
     fread(&header->byteProxReg, sizeof(long long int), 1, binFilePointer);
     fread(&header->nroRegistros, sizeof(int), 1, binFilePointer);
     fread(&header->nroRegRemovidos, sizeof(int), 1, binFilePointer);
