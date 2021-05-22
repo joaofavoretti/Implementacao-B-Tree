@@ -71,16 +71,25 @@ void comando_3()
 
     file->header = read_binary_veiculo_header(file->fp);
 
-    for(int i = 0; i < file->header->nroRegistros; i++)
+    int existeRegistro = 0;
+
+    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
+
+    for(int i = 0; i < totalDeRegistros; i++)
     {
         veiculo_data *data = read_binary_veiculo_data(file->header, file->fp);
         if(data->removido == '1') {
+            existeRegistro = 1;
             print_veiculo_data(file->header, data);
             printf("\n");
         } else {
             fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
         }
         free(data);
+    }
+
+    if (!existeRegistro) {
+        printf("Registro inexistente.\n");
     }
 
     close_binary_veiculo_file(file);
@@ -103,16 +112,25 @@ void comando_4(){
 
     file->header = read_binary_linha_header(file->fp);
 
-    for(int i = 0; i < file->header->nroRegistros; i++)
+    int existeRegistro = 0;
+
+    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
+
+    for(int i = 0; i < totalDeRegistros; i++)
     {
         linha_data *data = read_binary_linha_data(file->header, file->fp);
         if(data->removido == '1') {
+            existeRegistro = 1;
             print_linha_data(file->header, data);
             printf("\n");
         } else {
             fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
         }
         free(data);
+    }
+
+    if (!existeRegistro) {
+        printf("Registro inexistente.\n");
     }
 
     close_binary_linha_file(file);
@@ -142,11 +160,16 @@ void comando_5()
 
     file->header = read_binary_veiculo_header(file->fp);
 
-    for(int i = 0; i < file->header->nroRegistros; i++)
+    int existeRegistro = 0;
+
+    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
+
+    for(int i = 0; i < totalDeRegistros; i++)
     {
         veiculo_data *data = read_binary_veiculo_data(file->header, file->fp);
 
         if( data->removido == '1' && fieldcmp_veiculo(fieldValue, fieldName, data) == 0) {
+            existeRegistro = 1;
             print_veiculo_data(file->header, data);
             printf("\n");
 
@@ -155,6 +178,10 @@ void comando_5()
         }
 
         free(data);
+    }
+
+    if (!existeRegistro) {
+        printf("Registro inexistente.\n");
     }
 
     close_binary_veiculo_file(file);
@@ -184,11 +211,16 @@ void comando_6()
 
     file->header = read_binary_linha_header(file->fp);
 
-    for(int i = 0; i < file->header->nroRegistros; i++)
+    int existeRegistro = 0;
+
+    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
+
+    for(int i = 0; i < totalDeRegistros; i++)
     {
         linha_data *data = read_binary_linha_data(file->header, file->fp);
 
         if( data->removido == '1' && fieldcmp_linha(fieldValue, fieldName, data) == 0) {
+            existeRegistro = 1;
             print_linha_data(file->header, data);
             printf("\n");
             
@@ -197,6 +229,10 @@ void comando_6()
         }
 
         free(data);
+    }
+
+    if (!existeRegistro) {
+        printf("Registro inexistente.\n");
     }
 
     close_binary_linha_file(file);
