@@ -7,12 +7,13 @@
 #include <util.h>
 #include <string.h>
 
-/**
- * Funcao geral para checar se pointeiro foi alocado
- * Caso não, o programa é encerrado com o código ALLOC_NULL_POINTER
-*/
+
 void alloc_check(void *data_pointer, char *message)
 {
+    /**
+     * Funcao geral para checar se pointeiro foi alocado
+     * Caso não, o programa é encerrado com o código ALLOC_NULL_POINTER
+    */
     if(data_pointer == NULL) {
 
         if (message != NULL) {
