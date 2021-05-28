@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 
+#define FAIL_BINARY_STATUS 0
 #define LINHA_HEADER_SIZE 82     /* Tamanho do cabecalho do ao arquivo binario linha */
 
 /**
@@ -43,21 +44,12 @@ typedef struct {
     char corLinha[128];         // Tamanho variavel (maximo 128 bytes)
 } linha_data;
 
-/**
- * Arquivo para armazenar:
- *  - Ponteiro para o arquivo binario
- *  - Ponteiro para a struct de cabecalho que será atualizada quando a struct for liberada da memoria
- *  - Ponteiro para a ultima struct de dados manipulado (linha_data)
-*/
-typedef struct {
-    FILE *fp;                 // File pointer para o arquivo de registro de dados
-    linha_header *header;     // Ponteiro para o header do arquivo mantido em RAM
-    linha_data *data;         // Ponteiro para 1 registro de dados mantido em RAM
-} linha_file;
+linha_header *read_csv_linha_header(FILE *csvFilePointer);
+linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer);
 
-linha_file *read_csv_linha_file (char *csvFileName, char *binFileName);
-linha_header *read_csv_linha_header(FILE *csvFilePointer, FILE *binFilePointer);
-linha_data *read_csv_linha_data(linha_header *header, FILE *csvFilePointer, FILE *binFilePointer);
-linha_data *read_stdin_linha_data(int nOfEntries, linha_header *header, FILE *binFilePointer);
+linha_header *read_binary_linha_header(FILE *binFilePointer);
+linha_data *read_binary_linha_data(FILE *binFilePointer);
+
+linha_data *read_stdin_linha_data(linha_header *header);
 
 #endif

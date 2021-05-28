@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 
+#define FAIL_BINARY_STATUS 0
 #define VEICULO_HEADER_SIZE 175     /* Tamanho do cabecalho do ao arquivo binario veiculo */
                                     /* Usado para calcular o offset do primeiro registro de dados */
 
@@ -49,21 +50,13 @@ typedef struct {
     char categoria[128];        // Tamanho variavel (maximo 128 bytes)
 } veiculo_data;
 
-/**
- * Arquivo para armazenar:
- *  - Ponteiro para o arquivo binario
- *  - Ponteiro para a struct de cabecalho que será atualizada quando a struct for liberada da memoria
- *  - Ponteiro para a ultima struct de dados manipulado (veiculo_data)
-*/
-typedef struct {
-    FILE *fp;                   // File pointer para o arquivo de registro de dados
-    veiculo_header *header;     // Ponteiro para o header do arquivo mantido em RAM
-    veiculo_data *data;         // Ponteiro para 1 registro de dados mantido em RAM
-} veiculo_file;
 
-veiculo_file *read_csv_veiculo_file (char *csvFileName, char *binFileName);
-veiculo_header *read_csv_veiculo_header(FILE *csvFilePointer, FILE *binFilePointer);
-veiculo_data *read_csv_veiculo_data(veiculo_header *header, FILE *csvFilePointer, FILE *binFilePointer);
-veiculo_data *read_stdin_veiculo_data(int nEntries, veiculo_header *header, FILE *binFilePointer);
+veiculo_header *read_csv_veiculo_header(FILE *csvFilePointer);
+veiculo_data *read_csv_veiculo_data(veiculo_header* header, FILE *csvFilePointer);
+
+veiculo_header *read_binary_veiculo_header(FILE *binFilePointer);
+veiculo_data *read_binary_veiculo_data(FILE *binFilePointer);
+
+veiculo_data *read_stdin_veiculo_data(veiculo_header *header);
 
 #endif

@@ -3,6 +3,10 @@
         "is_null_field.h": "c",
         "array": "c",
         "string": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "stdlib.h": "c",
+        "util.h": "c",
+        "stdio.h": "c",
+        "string.h": "c"
     }
 }

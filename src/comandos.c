@@ -4,14 +4,13 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#include <veiculo_read.h>
-#include <linha_read.h>
-#include <write_binary.h>
-#include <read_binary.h>
-#include <close_binary.h>
-#include <alloc_check.h>
-#include <comandos.h>
+#include <read_veiculo.h>
+#include <read_linha.h>
+#include <write_veiculo.h>
+#include <write_linha.h>
+#include <print_register.h>
 #include <util.h>
+#include <comandos.h>
 #include <main.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,279 +19,324 @@
 void comando_1()
 {
     /**
-     * Comando 1 usado para ler um arquivo csv veiculo e gerar um arquivo binario veiculo
+     * Comando 1: usado para ler um arquivo csv veiculo e gerar um arquivo binario veiculo
     */
-    char *fileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
-    scanf("%s", fileName);
+    // Recebe as entradas do comando
+    char csvFileName[128], binFileName[128];
+    scanf("%s %s", csvFileName, binFileName);
 
-    char *binaryFileName = generate_bin_filename(fileName);
+    // Abre arquivo csv para leitura
+    FILE *csvFilePointer = fopen(csvFileName, "r");
+    alloc_check(csvFilePointer, "Falha no processamento do arquivo.");
 
-    veiculo_file *file = read_csv_veiculo_file(fileName, binaryFileName);
-    close_binary_veiculo_file(file);
-    binarioNaTela(binaryFileName);
+    // Abre arquivo binario para escrita
+    FILE *binFilePointer = fopen(binFileName, "wb");
 
-    free(fileName);
-    free(binaryFileName);
+    // Le o cabecalho do csv e escreve no binario
+    veiculo_header *header = read_csv_veiculo_header(csvFilePointer);
+    update_binary_veiculo_header(header, binFilePointer);
+
+    // Le linha por linha do csv e escreve no binario
+    veiculo_data *data;
+    while((data = read_csv_veiculo_data(header, csvFilePointer)) != NULL){
+        append_binary_veiculo_data(header, data, binFilePointer);
+        free(data);
+    }
+
+    // Coloca o arquivo como consistente e atualiza o header
+    header->status = '1';
+    update_binary_veiculo_header(header, binFilePointer);
+
+    fclose(csvFilePointer);
+    fclose(binFilePointer);
+    free(header);
+    binarioNaTela(binFileName);
 }
+
 
 void comando_2()
 {
     /**
-     * Comando 2 usado para ler um arquivo csv linha e gerar um arquivo binario linha
+     * Comando 2: usado para ler um arquivo csv linha e gerar um arquivo binario linha
     */
+    // Recebe as entradas do comando
+    char csvFileName[128], binFileName[128];
+    scanf("%s %s", csvFileName, binFileName);
 
-    char *fileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
-    scanf("%s", fileName);
+    // Abre arquivo csv para leitura
+    FILE *csvFilePointer = fopen(csvFileName, "r");
+    alloc_check(csvFilePointer, "Falha no processamento do arquivo.");
 
-    char *binaryFileName = generate_bin_filename(fileName);
+    // Abre arquivo binario para escrita
+    FILE *binFilePointer = fopen(binFileName, "wb");
 
-    linha_file *file = read_csv_linha_file(fileName, binaryFileName);
-    close_binary_linha_file(file);
-    binarioNaTela(binaryFileName);
+    // Le o cabecalho do csv e escreve no binario
+    linha_header *header = read_csv_linha_header(csvFilePointer);
+    update_binary_linha_header(header, binFilePointer);
 
-    free(fileName);
-    free(binaryFileName);
+    // Le linha por linha do csv e escreve no binario
+    linha_data *data;
+    while((data = read_csv_linha_data(header, csvFilePointer)) != NULL){
+        append_binary_linha_data(header, data, binFilePointer);
+        free(data);
+    }
+
+    // Coloca o arquivo como consistente e atualiza o header
+    header->status = '1';
+    update_binary_linha_header(header, binFilePointer);
+
+    fclose(csvFilePointer);
+    fclose(binFilePointer);
+    free(header);
+    binarioNaTela(binFileName);
 }
+
 
 void comando_3()
 {
     /*
-     *  Comando 3 usado para mostrar os dados de forma organizada dos registros em 'veiculo.bin'
+     *  Comando 3: usado para mostrar os dados de forma organizada dos registros em 'veiculo.bin'
      */
-
-    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    // Recebe as entradas do comando
+    char binFileName[256];
     scanf("%s", binFileName);
 
-    veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
-    alloc_check(file, "Falha no processamento do arquivo.\n");
+    // Abre o arquivo binario para leitura
+    FILE *binFilePointer = fopen(binFileName, "rb");
+    alloc_check(binFilePointer, "Falha no processamento do arquivo.\n");
 
-    file->fp = fopen(binFileName, "r");
-    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
-
-    file->header = read_binary_veiculo_header(file->fp);
+    // Le o cabecalho do arquivo binario
+    veiculo_header *header = read_binary_veiculo_header(binFilePointer);
 
     int existeRegistro = 0;
+    int totalDeRegistros = header->nroRegistros + header->nroRegRemovidos;
 
-    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
-
+    // Imprime os registros que nao foram removidos
     for(int i = 0; i < totalDeRegistros; i++)
     {
-        veiculo_data *data = read_binary_veiculo_data(file->header, file->fp);
+        veiculo_data *data = read_binary_veiculo_data(binFilePointer);
         if(data->removido == '1') {
             existeRegistro = 1;
-            print_veiculo_data(file->header, data);
+            print_veiculo_data(header, data);
             printf("\n");
         } else {
-            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+            fseek(binFilePointer, data->tamanhoRegistro, SEEK_CUR);
         }
         free(data);
     }
 
-    if (!existeRegistro) {
+    // Informa se nenhum registro foi encontrado
+    if (!existeRegistro)
         printf("Registro inexistente.\n");
-    }
 
-    close_binary_veiculo_file(file);
-    free(binFileName);
+    fclose(binFilePointer);
+    free(header);
 }
+
 
 void comando_4(){
     /*
      *  Comando 4 usado para mostrar os dados de forma organizada dos registros em 'linha.bin'
      */
-
-    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    // Recebe as entradas do comando
+    char binFileName[256];
     scanf("%s", binFileName);
 
-    linha_file *file = (linha_file *)calloc(sizeof(linha_file), 1 * sizeof(linha_file));
-    alloc_check(file, "Falha no processamento do arquivo.\n");
+    // Abre o arquivo binario para leitura
+    FILE *binFilePointer = fopen(binFileName, "rb");
+    alloc_check(binFilePointer, "Falha no processamento do arquivo.\n");
 
-    file->fp = fopen(binFileName, "r");
-    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
-
-    file->header = read_binary_linha_header(file->fp);
+    // Le o cabecalho do arquivo binario
+    linha_header *header = read_binary_linha_header(binFilePointer);
 
     int existeRegistro = 0;
+    int totalDeRegistros = header->nroRegistros + header->nroRegRemovidos;
 
-    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
-
+    // Imprime os registros que nao foram removidos
     for(int i = 0; i < totalDeRegistros; i++)
     {
-        linha_data *data = read_binary_linha_data(file->header, file->fp);
+        linha_data *data = read_binary_linha_data(binFilePointer);
         if(data->removido == '1') {
             existeRegistro = 1;
-            print_linha_data(file->header, data);
+            print_linha_data(header, data);
             printf("\n");
         } else {
-            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+            fseek(binFilePointer, data->tamanhoRegistro, SEEK_CUR);
         }
         free(data);
     }
 
-    if (!existeRegistro) {
+    // Informa se nenhum registro foi encontrado
+    if (!existeRegistro)
         printf("Registro inexistente.\n");
-    }
 
-    close_binary_linha_file(file);
-    free(binFileName);
+    fclose(binFilePointer);
+    free(header);
 }
+
 
 void comando_5()
 {
      /*
-     *  Comando 5 usado para mostrar resgistros de 'veiculo.bin' com base no criterio de busca
+     *  Comando 5: usado para mostrar resgistros de 'veiculo.bin' com base no criterio de busca
      */
-
-    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
-    scanf("%s", binFileName);
-
-    char fieldName[18];
-    scanf("%s", fieldName);
-
-    char fieldValue[128];
+    // Recebe as entradas do comando
+    char binFileName[128], fieldName[18], fieldValue[128];
+    scanf("%s %s", binFileName, fieldName);
     scan_quote_string(fieldValue);
 
-    veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
-    alloc_check(file, "Falha no processamento do arquivo.\n");
+    // Abre arquivo binario para leitura
+    FILE *binFilePointer = fopen(binFileName, "r");
+    alloc_check(binFilePointer, "Falha no processamento do arquivo.\n");
 
-    file->fp = fopen(binFileName, "r");
-    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
-
-    file->header = read_binary_veiculo_header(file->fp);
+    // Le o cabecalho do arquivo binario
+    veiculo_header *header = read_binary_veiculo_header(binFilePointer);
 
     int existeRegistro = 0;
+    int totalDeRegistros = header->nroRegistros + header->nroRegRemovidos;
 
-    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
-
+    // Busca sequencial pelos registros do arquivo binario
+    // Imprime aqueles que atendem o criterio de busca e nao foram removidos
     for(int i = 0; i < totalDeRegistros; i++)
     {
-        veiculo_data *data = read_binary_veiculo_data(file->header, file->fp);
+        veiculo_data *data = read_binary_veiculo_data(binFilePointer);
 
         if( data->removido == '1' && fieldcmp_veiculo(fieldValue, fieldName, data) == 0) {
             existeRegistro = 1;
-            print_veiculo_data(file->header, data);
+            print_veiculo_data(header, data);
             printf("\n");
 
         } else if(data->removido == '0') {
-            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+            fseek(binFilePointer, data->tamanhoRegistro, SEEK_CUR);
         }
 
         free(data);
     }
 
-    if (!existeRegistro) {
+    // Informa se nenhum registro foi encontrado
+    if (!existeRegistro)
         printf("Registro inexistente.\n");
-    }
 
-    close_binary_veiculo_file(file);
-    free(binFileName);
+    fclose(binFilePointer);
+    free(header);
 }
+
 
 void comando_6()
 {
      /*
      *  Comando 6 usado para mostrar resgistros de 'linha.bin' com base no criterio de busca
      */
-
-    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
-    scanf("%s", binFileName);
-
-    char fieldName[18];
-    scanf("%s", fieldName);
-
-    char fieldValue[128];
+    // Recebe as entradas do comando
+    char binFileName[128], fieldName[18], fieldValue[128];
+    scanf("%s %s", binFileName, fieldName);
     scan_quote_string(fieldValue);
 
-    linha_file *file = (linha_file *)calloc(sizeof(linha_file), 1 * sizeof(linha_file));
-    alloc_check(file, "Falha no processamento do arquivo.\n");
+    // Abre arquivo binario para leitura
+    FILE *binFilePointer = fopen(binFileName, "r");
+    alloc_check(binFilePointer, "Falha no processamento do arquivo.\n");
 
-    file->fp = fopen(binFileName, "r");
-    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
-
-    file->header = read_binary_linha_header(file->fp);
+    // Le o cabecalho do arquivo binario
+    linha_header *header = read_binary_linha_header(binFilePointer);
 
     int existeRegistro = 0;
+    int totalDeRegistros = header->nroRegistros + header->nroRegRemovidos;
 
-    int totalDeRegistros = file->header->nroRegistros + file->header->nroRegRemovidos;
 
+    // Busca sequencial pelos registros do arquivo binario
+    // Imprime aqueles que atendem o criterio de busca e nao foram removidos
     for(int i = 0; i < totalDeRegistros; i++)
     {
-        linha_data *data = read_binary_linha_data(file->header, file->fp);
+        linha_data *data = read_binary_linha_data(binFilePointer);
 
         if( data->removido == '1' && fieldcmp_linha(fieldValue, fieldName, data) == 0) {
             existeRegistro = 1;
-            print_linha_data(file->header, data);
+            print_linha_data(header, data);
             printf("\n");
-            
+
         } else if(data->removido == '0') {
-            fseek(file->fp, data->tamanhoRegistro, SEEK_CUR);
+            fseek(binFilePointer, data->tamanhoRegistro, SEEK_CUR);
         }
 
         free(data);
     }
 
-    if (!existeRegistro) {
+    // Informa se nenhum registro foi encontrado
+    if (!existeRegistro)
         printf("Registro inexistente.\n");
-    }
 
-    close_binary_linha_file(file);
-    free(binFileName);
+    fclose(binFilePointer);
+    free(header);
 }
+
 
 void comando_7()
 {
     /**
-     * Comando 7 Usado para ler entradas da entrada padrao e escrever no arquivo binario de veiculo
+     * Comando 7: Usado para ler entradas da entrada padrao e escrever no arquivo binario de veiculo
     */
 
+    // Recebe as entradas do comando
     int n;
-    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    char binFileName[128];
     scanf("%s %d", binFileName, &n);
 
-    veiculo_file *file = (veiculo_file *)calloc(sizeof(veiculo_file), 1 * sizeof(veiculo_file));
-    alloc_check(file, "Falha no processamento do arquivo.\n");
+    // Abre arquivo binario para adicionar registros
+    FILE *binFilePointer = fopen(binFileName, "r+");
+    alloc_check(binFilePointer, "Falha no processamento do arquivo.\n");
 
-    file->fp = fopen(binFileName, "r+");
-    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+    // Le o cabecalho do arquivo binario
+    veiculo_header *header = read_binary_veiculo_header(binFilePointer);
 
-    file->header = read_binary_veiculo_header(file->fp);
-    #ifdef DEBUG
-    print__veiculo_header(file->header);
-    #endif
+    // Le veiculo por veiculo da entrada padrao (stdin) e escreve no binario
+    veiculo_data *data;
+    for(int i = 0; i < n; i++){
+        data = read_stdin_veiculo_data(header);
+        append_binary_veiculo_data(header, data, binFilePointer);
+        free(data);
+    }
 
-    file->data = read_stdin_veiculo_data(n, file->header, file->fp);
+    // Coloca o arquivo como consistente e atualiza o header
+    header->status = '1';
+    update_binary_veiculo_header(header, binFilePointer);
 
-    close_binary_veiculo_file(file);
+    fclose(binFilePointer);
+    free(header);
     binarioNaTela(binFileName);
-
-    free(binFileName);
 }
+
 
 void comando_8()
 {
     /**
-     * Comando 8 Usado para ler entradas da entrada padrao e escrever no arquivo binario de linha
+     * Comando 8: Usado para ler entradas da entrada padrao e escrever no arquivo binario de linha
     */
-
+   
+    // Recebe as entradas do comando
     int n;
-    char *binFileName = (char *)calloc(sizeof(char), 128 * sizeof(char));
+    char binFileName[128];
     scanf("%s %d", binFileName, &n);
 
-    linha_file *file = (linha_file *)calloc(sizeof(linha_file), 1 * sizeof(linha_file));
-    alloc_check(file, "Falha no processamento do arquivo.\n");
+    // Abre arquivo binario para adicionar registros
+    FILE *binFilePointer = fopen(binFileName, "r+");
+    alloc_check(binFilePointer, "Falha no processamento do arquivo.\n");
 
-    file->fp = fopen(binFileName, "r+");
-    alloc_check(file->fp, "Falha no processamento do arquivo.\n");
+    // Le o cabecalho do arquivo binario
+    linha_header *header = read_binary_linha_header(binFilePointer);
 
-    file->header = read_binary_linha_header(file->fp);
-    #ifdef DEBUG
-    print__linha_header(file->header);
-    #endif
+    // Le veiculo por veiculo da entrada padrao (stdin) e escreve no binario
+    linha_data *data;
+    for(int i = 0; i < n; i++){
+        data = read_stdin_linha_data(header);
+        append_binary_linha_data(header, data, binFilePointer);
+        free(data);
+    }
 
-    file->data = read_stdin_linha_data(n, file->header, file->fp);
+    // Coloca o arquivo como consistente e atualiza o header
+    header->status = '1';
+    update_binary_linha_header(header, binFilePointer);
 
-    close_binary_linha_file(file);
+    fclose(binFilePointer);
+    free(header);
     binarioNaTela(binFileName);
-
-    free(binFileName);
 }
