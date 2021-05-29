@@ -7,7 +7,10 @@
 #ifndef _LINHA_READ_H_
 #define _LINHA_READ_H_
 
+#include <util.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define FAIL_BINARY_STATUS 0
 #define LINHA_HEADER_SIZE 82     /* Tamanho do cabecalho do ao arquivo binario linha */

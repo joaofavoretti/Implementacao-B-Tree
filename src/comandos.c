@@ -4,17 +4,7 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#include <read_veiculo.h>
-#include <read_linha.h>
-#include <write_veiculo.h>
-#include <write_linha.h>
-#include <print_register.h>
-#include <util.h>
 #include <comandos.h>
-#include <main.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void comando_1()
 {

@@ -5,9 +5,6 @@
  */
 
 #include <write_veiculo.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void update_binary_veiculo_header(veiculo_header *header, FILE *binFilePointer)
 {
@@ -15,8 +12,8 @@ void update_binary_veiculo_header(veiculo_header *header, FILE *binFilePointer)
      * Funcao para reescrever todo o cabecalho escrito no arquivo
      * Seta cursor no inicio do arquivo para a leitura e depois posiciona o cursor no 1o byte do 1o registro
      * 
-     * @param header Struct armazenando o header do arquivo. Usado para escrever as informacoes salvas no header no arquivo
-     * @param binFilePointer Ponteiro aberto para o arquivo binario do veiculo, usado para armazenar as informações dos registros.
+     * @param header Struct armazenando os dados do header do arquivo.
+     * @param binFilePointer Ponteiro aberto para o arquivo binario do veiculo
     */
 
     /* Posicionar o cursor no inicio do arquivo binario para atualizar o aquivo binario */
@@ -40,6 +37,14 @@ void update_binary_veiculo_header(veiculo_header *header, FILE *binFilePointer)
 
 void append_binary_veiculo_data (veiculo_header *header, veiculo_data *data, FILE *binFilePointer)
 {
+    /**
+     * Funcao para adicionar um registro no arquivo binario veiculo.
+     * 
+     * @param header Struct armazenando os dados do header do arquivo.
+     * @param data Struct armazenando os dados do registro que sera escrito.
+     * @param binFilePointer Ponteiro aberto para o arquivo binario do veiculo
+    */
+
     /* Posicionar o ponteiro na posicao do próximo registro */
     fseek(binFilePointer, header->byteProxReg, SEEK_SET);
 

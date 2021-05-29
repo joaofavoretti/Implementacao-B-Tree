@@ -7,7 +7,10 @@
 #ifndef _VEICULO_READ_H_
 #define _VEICULO_READ_H_
 
+#include <util.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define FAIL_BINARY_STATUS 0
 #define VEICULO_HEADER_SIZE 175     /* Tamanho do cabecalho do ao arquivo binario veiculo */

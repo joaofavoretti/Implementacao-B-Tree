@@ -10,6 +10,7 @@
 #include <read_veiculo.h>
 #include <read_linha.h>
 #include <stdlib.h>
+#include <string.h>
 
 void print_veiculo_data(veiculo_header *header, veiculo_data *data);
 int fieldcmp_veiculo(char *fieldValue, char *fieldName, veiculo_data *data);

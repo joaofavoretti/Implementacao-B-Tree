@@ -4,43 +4,52 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#include <main.h>
 #include <comandos.h>
 
 int main(int argc, char **argv) {
+    /* Recebe o comando */
     int comando;
     scanf("%d", &comando);
 
+    /* Executa o comando */
     switch(comando) {
         case 1:
-            comando_1();
+            /* CREATE TABLE - Lê veiculo.csv e grava os registros em arquivo binario */
+            comando_1(); 
             break;
 
         case 2:
+            /* CREATE TABLE - Lê linha.csv e grava os registros em arquivo binario */
             comando_2();
             break;
             
         case 3:
+            /* SELECT - Recuperação dos registros de veiculo.bin */
             comando_3();
             break;
             
         case 4:
+            /* SELECT - Recuperação dos registros de linha.bin */
             comando_4();
             break;
             
         case 5:
+            /* SELECT WHERE - Recuperação dos registros de veiculo.bin com base no critério de busca */
             comando_5();
             break;
             
         case 6:
+            /* SELECT WHERE - Recuperação dos registros de linha.bin com base no critério de busca */
             comando_6();
             break;
             
         case 7:
+            /* INSERT INTO - Insere um novo registro, lido na entrada padrao, em veiculo.bin */
             comando_7();
             break;
             
         case 8:
+            /* INSERT INTO - Insere um novo registro, lido na entrada padrao, em linha.bin */
             comando_8();
             break;
     }

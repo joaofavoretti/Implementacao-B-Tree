@@ -8,6 +8,9 @@
 #define _WRITE_LINHA_H_
 
 #include <read_linha.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void update_binary_linha_header(linha_header *header, FILE *binFilePointer);
 void append_binary_linha_data (linha_header *header, linha_data *data, FILE *binFilePointer);

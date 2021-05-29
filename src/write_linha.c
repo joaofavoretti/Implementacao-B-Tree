@@ -5,9 +5,6 @@
  */
 
 #include <write_linha.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void update_binary_linha_header(linha_header *header, FILE *binFilePointer)
 {
@@ -38,6 +35,14 @@ void update_binary_linha_header(linha_header *header, FILE *binFilePointer)
 
 void append_binary_linha_data (linha_header *header, linha_data *data, FILE *binFilePointer)
 {
+    /**
+     * Funcao para adicionar um registro no arquivo binario linha.
+     * 
+     * @param header Struct armazenando os dados do header do arquivo.
+     * @param data Struct armazenando os dados do registro que sera escrito.
+     * @param binFilePointer Ponteiro aberto para o arquivo binario do veiculo
+    */
+
     /* Posicionar o ponteiro na posicao do próximo registro */
     fseek(binFilePointer, header->byteProxReg, SEEK_SET);
 

@@ -5,9 +5,6 @@
  */
 
 #include <print_register.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 char *format_data_field(char *data) 
 {

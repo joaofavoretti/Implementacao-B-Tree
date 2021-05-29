@@ -6,7 +6,6 @@
 
 #include <read_veiculo.h>
 #include <write_veiculo.h>
-#include <main.h>
 #include <util.h>
 #include <stdio.h>
 #include <stdlib.h>

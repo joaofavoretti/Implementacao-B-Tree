@@ -5,12 +5,6 @@
  */
 
 #include <read_linha.h>
-#include <write_linha.h>
-#include <util.h>
-#include <main.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 linha_header *read_csv_linha_header(FILE *csvFilePointer)
 {
