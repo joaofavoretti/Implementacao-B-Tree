@@ -52,6 +52,22 @@ int main(int argc, char **argv) {
             /* INSERT INTO - Insere um novo registro, lido na entrada padrao, em linha.bin */
             comando_8();
             break;
+
+        case 9:
+            comando_9();
+            break;
+
+        case 10:
+            comando_10();
+            break;
+
+        case 11:
+            comando_11();
+            break;
+
+        case 12:
+            comando_12();
+            break;
     }
 
     return 0;

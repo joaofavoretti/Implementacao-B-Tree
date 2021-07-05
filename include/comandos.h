@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <b_tree.h>
 
 void comando_1();
 void comando_2();
@@ -25,5 +26,10 @@ void comando_5();
 void comando_6();
 void comando_7();
 void comando_8();
+
+void comando_9();
+void comando_10();
+void comando_11();
+void comando_12();
 
 #endif

@@ -8,6 +8,7 @@
 #define _UTIL_H_
 
 #define ALLOC_NULL_POINTER 0
+#define FAIL_BINARY_STATUS 0
 
 #include <util.h>
 #include <string.h>
@@ -21,6 +22,7 @@ int is_null_field(char *field);
 /* Funcoes fornecidas */
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
+int convertePrefixo(char* str);
 
 
 #endif

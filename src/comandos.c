@@ -330,3 +330,218 @@ void comando_8()
     free(header);
     binarioNaTela(binFileName);
 }
+
+
+void comando_9()
+{
+    /**
+     *  Esse comando permitir criar um arquivo de indice (arvore-B)
+     *  para o arquivo de dados veiculo 
+     */
+    // Recebe as entradas do comando
+    char dataFilename[128], bTreeFilename[128];
+    scanf("%s %s", dataFilename, bTreeFilename);
+
+    // Abre o arquivo de dados para leitura e o de indice para escrita
+    FILE *dataFile = fopen(dataFilename, "r");
+    alloc_check(dataFile, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(bTreeFilename, "w+");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho do arquivo de dados
+    veiculo_header *veiculoHeader = read_binary_veiculo_header(dataFile);
+    // Inicializa o cabecalho do qruivo de indice
+    bTree_header *bTreeHeader = malloc(sizeof(bTree_header));
+    bTreeHeader->noRaiz = 0;
+    bTreeHeader->RRNproxNo = 1;
+    bTreeHeader->status = '0';
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    //Inicializa o arquivo com o no raiz
+    bTree_page raiz;
+    raiz.folha = '1';
+    raiz.RRNdoNo = 0;
+    raiz.nroChavesIndexadas = 0;
+    for(int i = 0; i < 4; i++){
+        raiz.c[i] = -1;
+        raiz.pr[i] = -1;
+        raiz.p[i] = -1;
+    } 
+    raiz.p[4] = -1;
+
+    write_bTree_page(0, &raiz, bTreeFile);
+
+
+    // Le registro por registro do arquivo de dados
+    // e insere as chaves no arquivo de indice
+    int totalDeRegistros = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;
+    // printf("TOTAL: %d\n", totalDeRegistros);
+    for(int i = 0; i < totalDeRegistros; i++)
+    {
+        // printf("\n#########################\n");
+        veiculo_data *data = read_binary_veiculo_data(dataFile);
+        if(data->removido == '1') {
+            bTree_pair pair;
+            int promotedRNN;
+            pair.key = convertePrefixo(data->prefixo);
+            pair.reference = ftell(dataFile);
+            printf("Key: %d, Ref: %ld\n", pair.key, pair.reference);
+            int res = insert(bTreeHeader->noRaiz, bTreeHeader, bTreeFile, &pair, &promotedRNN);
+            if(res == PROMOTED){
+                raiz.folha = '0';
+                raiz.RRNdoNo = bTreeHeader->RRNproxNo;
+                raiz.nroChavesIndexadas = 1;
+                for(int i = 0; i < 4; i++){
+                    raiz.c[i] = -1;
+                    raiz.pr[i] = -1;
+                    raiz.p[i] = -1;
+                } 
+                raiz.p[4] = -1;
+
+                raiz.c[0] = pair.key;
+                raiz.pr[0] = pair.reference;
+                raiz.p[0] = bTreeHeader->noRaiz;
+                raiz.p[1] = promotedRNN;
+
+                bTreeHeader->noRaiz = raiz.RRNdoNo;
+                bTreeHeader->RRNproxNo += 1;
+
+                // printf("\n######\nnNova raiz\n:");
+                // printf("RRN da raiz = %d\n", raiz.RRNdoNo);
+                // for(int i = 0; i < 4; i++)
+                //     printf("%d ", raiz.c[i]);
+                // printf("\n");
+
+                write_bTree_page(raiz.RRNdoNo, &raiz, bTreeFile);
+            }
+        } else {
+            fseek(dataFile, data->tamanhoRegistro, SEEK_CUR);
+        }
+        free(data);
+    }
+
+
+    bTreeHeader->status = '1';
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    
+    free(veiculoHeader);
+    free(bTreeHeader);
+    fclose(dataFile);
+    fclose(bTreeFile);
+
+    bTreeFile = fopen("casos_abertos/indicePrefixo1_my.bin", "r");
+    bTreeHeader = read_bTree_header(bTreeFile);
+    int i = 0;
+    while(!feof(bTreeFile)){
+        bTree_page *page = read_bTree_page(i, bTreeFile);
+        print_bTree_page(page);
+        free(page);
+        i++;
+        printf("\n\n");
+    }
+
+    fclose(bTreeFile);
+    free(bTreeHeader);
+    binarioNaTela(bTreeFilename);
+}
+
+
+void comando_10()
+{
+
+}
+
+
+void comando_11()
+{
+    /**
+     * Comando usado para recuperar um registro do tipo veiculo
+     *  pelo campo prefixo
+     */
+
+    // Recebe as entradas do comando
+    char dataFilename[128], bTreeFilename[128], prefix[128];
+    scanf("%s %s prefixo ", dataFilename, bTreeFilename);
+    scan_quote_string(prefix);
+
+    // Abre arquivos binario para leitura
+    FILE *dataFile = fopen(dataFilename, "r");
+    alloc_check(dataFile, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(bTreeFilename, "r");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalhos
+    veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);
+    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+
+    // Pesquisa pela chave no arquivo de indice e retorna a referencia
+    int key = convertePrefixo(prefix);
+    long int ref;
+    int res = search(bTreeHeader->noRaiz, key, bTreeFile, &ref);
+
+    // Verifica se encontrou
+    if(res == NOT_FOUND)
+        printf("Registro inexistente.\n");
+    else{
+        // Acessa a posicao do registro no arquivo de dados
+        fseek(dataFile, ref, SEEK_SET);
+        // Le o registro
+        veiculo_data *data = read_binary_veiculo_data(dataFile);
+        // Imprime
+        print_veiculo_data(dataHeader, data);
+        free(data);
+    }
+
+    // Fecha arquivos e libera memoria heap
+    fclose(dataFile);
+    fclose(bTreeFile);
+    free(dataHeader);
+    free(bTreeHeader);
+}
+
+void comando_12()
+{
+    /**
+     * Comando usado para recuperar um registro do tipo linha
+     *  pelo campo prefixo
+     */
+
+    // Recebe as entradas do comando
+    char dataFilename[128], bTreeFilename[128];
+    int codLinha;
+    scanf("%s %s codLinha %d", dataFilename, bTreeFilename, &codLinha);
+
+    // Abre arquivos binario para leitura
+    FILE *dataFile = fopen(dataFilename, "r");
+    alloc_check(dataFile, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(bTreeFilename, "r");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalhos
+    linha_header *dataHeader = read_binary_linha_header(dataFile);
+    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+
+    // Pesquisa pela chave no arquivo de indice e retorna a referencia
+    long int ref;
+    int res = search(bTreeHeader->noRaiz, codLinha, bTreeFile, &ref);
+
+    // Verifica se encontrou
+    if(res == NOT_FOUND)
+        printf("Registro inexistente.\n");
+    else{
+        // Acessa a posicao do registro no arquivo de dados
+        fseek(dataFile, ref, SEEK_SET);
+        // Le o registro
+        linha_data *data = read_binary_linha_data(dataFile);
+        // Imprime
+        print_linha_data(dataHeader, data);
+        free(data);
+    }
+
+    // Fecha arquivos e libera memoria heap
+    fclose(dataFile);
+    fclose(bTreeFile);
+    free(dataHeader);
+    free(bTreeHeader);
+}
