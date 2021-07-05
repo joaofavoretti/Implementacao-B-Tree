@@ -379,13 +379,14 @@ void comando_9()
     for(int i = 0; i < totalDeRegistros; i++)
     {
         // printf("\n#########################\n");
+        int reference = ftell(dataFile);
         veiculo_data *data = read_binary_veiculo_data(dataFile);
         if(data->removido == '1') {
             bTree_pair pair;
             int promotedRNN;
             pair.key = convertePrefixo(data->prefixo);
-            pair.reference = ftell(dataFile);
-            printf("Key: %d, Ref: %ld\n", pair.key, pair.reference);
+            pair.reference = reference;
+            // printf("Key: %d, Ref: %ld\n", pair.key, pair.reference);
             int res = insert(bTreeHeader->noRaiz, bTreeHeader, bTreeFile, &pair, &promotedRNN);
             if(res == PROMOTED){
                 raiz.folha = '0';
@@ -430,19 +431,19 @@ void comando_9()
     fclose(dataFile);
     fclose(bTreeFile);
 
-    bTreeFile = fopen("casos_abertos/indicePrefixo1_my.bin", "r");
-    bTreeHeader = read_bTree_header(bTreeFile);
-    int i = 0;
-    while(!feof(bTreeFile)){
-        bTree_page *page = read_bTree_page(i, bTreeFile);
-        print_bTree_page(page);
-        free(page);
-        i++;
-        printf("\n\n");
-    }
+    // bTreeFile = fopen("casos_abertos/indicePrefixo1_my.bin", "r");
+    // bTreeHeader = read_bTree_header(bTreeFile);
+    // int i = 0;
+    // while(!feof(bTreeFile)){
+    //     bTree_page *page = read_bTree_page(i, bTreeFile);
+    //     print_bTree_page(page);
+    //     free(page);
+    //     i++;
+    //     printf("\n\n");
+    // }
 
-    fclose(bTreeFile);
-    free(bTreeHeader);
+    // fclose(bTreeFile);
+    // free(bTreeHeader);
     binarioNaTela(bTreeFilename);
 }
 
