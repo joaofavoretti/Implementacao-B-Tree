@@ -68,6 +68,14 @@ int main(int argc, char **argv) {
         case 12:
             comando_12();
             break;
+
+        case 13:
+            comando_13();
+            break;
+
+        case 14:
+            comando_14();
+            break;
     }
 
     return 0;

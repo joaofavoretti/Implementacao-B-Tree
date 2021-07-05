@@ -31,5 +31,7 @@ void comando_9();
 void comando_10();
 void comando_11();
 void comando_12();
+void comando_13();
+void comando_14();
 
 #endif

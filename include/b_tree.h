@@ -53,8 +53,8 @@ bTree_page *read_bTree_page(int RNN, FILE *bTree);
 void write_bTree_page(int RNN, bTree_page *page, FILE *bTree);
 void print_bTree_page(bTree_page *page);
 
-int search(int RNN, int key, FILE *bTree, long int *reference);
-int insert(int RNN, bTree_header *header, FILE *bTree, bTree_pair *promotedPair, int *promotedRNN);
+int search(int RNN, int key, FILE *bTree, long long int *reference);
+void insert(int key, long long int reference, bTree_header *header, FILE *bTree);
 
 
 #endif

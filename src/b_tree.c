@@ -67,28 +67,11 @@ bTree_page *read_bTree_page(int RNN, FILE *bTree)
     for(int i = 0; i < 4; i++){
         fread(&page->p[i], sizeof(int), 1, bTree);
         fread(&page->c[i], sizeof(int), 1, bTree);
-        fread(&page->pr[i], sizeof(long int), 1, bTree);
+        fread(&page->pr[i], sizeof(long long int), 1, bTree);
     }
     fread(&page->p[4], sizeof(int), 1, bTree);
 
     return page;
-}
-
-
-void print_bTree_page(bTree_page *page){
-    printf("Folha: %c\n", page->folha);
-    printf("RRN do No: %d\n", page->RRNdoNo);
-    printf("Nro de Chaves: %d\n", page->nroChavesIndexadas);
-    printf("Chaves: \n");
-    for(int i = 0; i < 4; i++){
-        printf("(%d, %ld) ", page->c[i], page->pr[i]);
-    }
-    printf("\n");
-    printf("Filhos: \n");
-    for(int i = 0; i < 5; i++){
-        printf("%d ", page->p[i]);
-    }
-    printf("\n");
 }
 
 
@@ -103,13 +86,13 @@ void write_bTree_page(int RNN, bTree_page *page, FILE *bTree)
     for(int i = 0; i < 4; i++){
         fwrite(&page->p[i], sizeof(int), 1, bTree);
         fwrite(&page->c[i], sizeof(int), 1, bTree);
-        fwrite(&page->pr[i], sizeof(long int), 1, bTree);
+        fwrite(&page->pr[i], sizeof(long long int), 1, bTree);
     }
     fwrite(&page->p[4], sizeof(int), 1, bTree);
 }
 
 
-int search(int RNN, int key, FILE *bTree, long int *reference)
+int search(int RNN, int key, FILE *bTree, long long int *reference)
 {
     /**
      *  Pesquisa pela chave no arquivo de indice arvore-B e retorna
@@ -144,6 +127,31 @@ int search(int RNN, int key, FILE *bTree, long int *reference)
 }
 
 
+void create_root(bTree_pair *pair, int left, int rigth, bTree_header *header, FILE *bTree)
+{
+    bTree_page root;
+    root.folha = '0';
+    if(rigth == -1)
+        root.folha = '1';
+    root.RRNdoNo = header->RRNproxNo;
+    root.nroChavesIndexadas = 1;
+
+    root.c[0] = pair->key;
+    root.pr[0] = pair->reference;
+    root.p[0] = left;
+    root.p[1] = rigth;
+    for(int i = 1; i < 4; i++){
+        root.c[i] = -1;
+        root.pr[i] = -1;
+        root.p[i+1] = -1;
+    } 
+
+    write_bTree_page(root.RRNdoNo, &root, bTree);
+    header->RRNproxNo += 1;
+    header->noRaiz = root.RRNdoNo;
+}
+
+
 void insertion(bTree_page *page, bTree_pair *pair, int promotedRNN){
     int i;
     for(i = page->nroChavesIndexadas; i > 0 && pair->key < page->c[i-1]; i--){
@@ -161,7 +169,7 @@ void insertion(bTree_page *page, bTree_pair *pair, int promotedRNN){
 
 bTree_page *split(bTree_page *page, bTree_pair *pair, int *promotedRNN, int nextRNN){
     int p_temp[6], c_temp[5];
-    long int pr_temp[5];
+    long long int pr_temp[5];
     int i;
 
     // Copia valores para os arrays temporarios
@@ -217,56 +225,35 @@ bTree_page *split(bTree_page *page, bTree_pair *pair, int *promotedRNN, int next
     pair->reference = pr_temp[2];
     *promotedRNN = nextRNN;
 
-    // printf("\nPagina:");
-    // for(i = 0; i < 4;  i++){
-    //     printf("%d ", page->c[i]);
-    // }
-    // printf("\nPagina nova: ");
-    // for(i = 0; i < 4;  i++){
-    //     printf("%d ", newPage->c[i]);
-    // }
-    // printf("\n");
-
     return newPage;
 }
 
 
-int insert(int RNN, bTree_header *header, FILE *bTree, bTree_pair *promotedPair, int *promotedRNN)
+int insert_procedure(int RNN, bTree_header *header, FILE *bTree, bTree_pair *promotedPair, int *promotedRNN)
 {
     // Promove a chave original quando atinge o no folha
-    if(RNN == -1){ 
-        *promotedRNN = -1;
+    if(RNN == -1)
         return PROMOTED;
-    }
 
     // Le a pagina corrente
     bTree_page *page = read_bTree_page(RNN, bTree);
-    // printf("\nRNN atual: %d\n", page->RRNdoNo);
 
     // Posicao em que a chave deveria ficar
     int pos = 0;
     while(pos < 4 && page->c[pos] < promotedPair->key && page->c[pos] != -1){
         pos++;
     }
-    // for(int i = 0; i < 4; i++){
-    //     printf("(%d, %ld) ", page->c[i], page->pr[i]);
-    // }
-    // printf("\n");
 
-    // printf("Next RNN: %d\n", page->p[pos]);
-    int result = insert(page->p[pos], header, bTree, promotedPair, promotedRNN);
-    // printf("Resultado: %d\n", result);
+    int result = insert_procedure(page->p[pos], header, bTree, promotedPair, promotedRNN);
 
     if(result == NOT_PROMOTED) 
         result = NOT_PROMOTED;
     else if(page->nroChavesIndexadas < 4){
-        // printf("Insertion...\n");
         insertion(page, promotedPair, *promotedRNN);
         write_bTree_page(RNN, page, bTree);
         result = NOT_PROMOTED;
     } 
     else {
-        // printf("Split...\n");
         bTree_page *newPage = split(page, promotedPair, promotedRNN, header->RRNproxNo);
         write_bTree_page(RNN, page, bTree);
         write_bTree_page(*promotedRNN, newPage, bTree);
@@ -277,4 +264,21 @@ int insert(int RNN, bTree_header *header, FILE *bTree, bTree_pair *promotedPair,
 
     free(page);
     return result;
+}
+
+
+void insert(int key, long long int reference, bTree_header *header, FILE *bTree)
+{
+    bTree_pair pair;
+    int promotedRNN = -1;
+
+    // Par que sera inserido
+    pair.key = key;
+    pair.reference = reference;
+
+    // Insere o par com o procedimento recursivo de insercao
+    int result = insert_procedure(header->noRaiz, header, bTree, &pair, &promotedRNN);
+    // Se necessario cria uma nova raiz
+    if(result == PROMOTED)
+        create_root(&pair, header->noRaiz, promotedRNN, header, bTree);
 }

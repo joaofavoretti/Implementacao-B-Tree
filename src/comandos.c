@@ -350,78 +350,28 @@ void comando_9()
 
     // Le cabecalho do arquivo de dados
     veiculo_header *veiculoHeader = read_binary_veiculo_header(dataFile);
-    // Inicializa o cabecalho do qruivo de indice
-    bTree_header *bTreeHeader = malloc(sizeof(bTree_header));
-    bTreeHeader->noRaiz = 0;
-    bTreeHeader->RRNproxNo = 1;
+    // Inicializa o cabecalho do qruivo de indice com status inconsistente
+    bTree_header *bTreeHeader = calloc(1, sizeof(bTree_header));
     bTreeHeader->status = '0';
+    bTreeHeader->noRaiz = -1;
     update_bTree_header(bTreeHeader, bTreeFile);
-
-    //Inicializa o arquivo com o no raiz
-    bTree_page raiz;
-    raiz.folha = '1';
-    raiz.RRNdoNo = 0;
-    raiz.nroChavesIndexadas = 0;
-    for(int i = 0; i < 4; i++){
-        raiz.c[i] = -1;
-        raiz.pr[i] = -1;
-        raiz.p[i] = -1;
-    } 
-    raiz.p[4] = -1;
-
-    write_bTree_page(0, &raiz, bTreeFile);
-
 
     // Le registro por registro do arquivo de dados
     // e insere as chaves no arquivo de indice
     int totalDeRegistros = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;
-    // printf("TOTAL: %d\n", totalDeRegistros);
     for(int i = 0; i < totalDeRegistros; i++)
     {
-        // printf("\n#########################\n");
-        int reference = ftell(dataFile);
+        long long int reference = ftell(dataFile);
         veiculo_data *data = read_binary_veiculo_data(dataFile);
-        if(data->removido == '1') {
-            bTree_pair pair;
-            int promotedRNN;
-            pair.key = convertePrefixo(data->prefixo);
-            pair.reference = reference;
-            // printf("Key: %d, Ref: %ld\n", pair.key, pair.reference);
-            int res = insert(bTreeHeader->noRaiz, bTreeHeader, bTreeFile, &pair, &promotedRNN);
-            if(res == PROMOTED){
-                raiz.folha = '0';
-                raiz.RRNdoNo = bTreeHeader->RRNproxNo;
-                raiz.nroChavesIndexadas = 1;
-                for(int i = 0; i < 4; i++){
-                    raiz.c[i] = -1;
-                    raiz.pr[i] = -1;
-                    raiz.p[i] = -1;
-                } 
-                raiz.p[4] = -1;
-
-                raiz.c[0] = pair.key;
-                raiz.pr[0] = pair.reference;
-                raiz.p[0] = bTreeHeader->noRaiz;
-                raiz.p[1] = promotedRNN;
-
-                bTreeHeader->noRaiz = raiz.RRNdoNo;
-                bTreeHeader->RRNproxNo += 1;
-
-                // printf("\n######\nnNova raiz\n:");
-                // printf("RRN da raiz = %d\n", raiz.RRNdoNo);
-                // for(int i = 0; i < 4; i++)
-                //     printf("%d ", raiz.c[i]);
-                // printf("\n");
-
-                write_bTree_page(raiz.RRNdoNo, &raiz, bTreeFile);
-            }
-        } else {
+        // Verifica se nao esta logicamente removido
+        if(data->removido == '1')
+            insert(convertePrefixo(data->prefixo), reference, bTreeHeader, bTreeFile);
+        else
             fseek(dataFile, data->tamanhoRegistro, SEEK_CUR);
-        }
         free(data);
     }
 
-
+    // Muda o estado do arquivo para consistente e atualiza cabecalho
     bTreeHeader->status = '1';
     update_bTree_header(bTreeHeader, bTreeFile);
 
@@ -430,27 +380,59 @@ void comando_9()
     free(bTreeHeader);
     fclose(dataFile);
     fclose(bTreeFile);
-
-    // bTreeFile = fopen("casos_abertos/indicePrefixo1_my.bin", "r");
-    // bTreeHeader = read_bTree_header(bTreeFile);
-    // int i = 0;
-    // while(!feof(bTreeFile)){
-    //     bTree_page *page = read_bTree_page(i, bTreeFile);
-    //     print_bTree_page(page);
-    //     free(page);
-    //     i++;
-    //     printf("\n\n");
-    // }
-
-    // fclose(bTreeFile);
-    // free(bTreeHeader);
     binarioNaTela(bTreeFilename);
 }
 
 
 void comando_10()
 {
+    /**
+     *  Esse comando permitir criar um arquivo de indice (arvore-B)
+     *  para o arquivo de dados linha 
+     */
+    // Recebe as entradas do comando
+    char dataFilename[128], bTreeFilename[128];
+    scanf("%s %s", dataFilename, bTreeFilename);
 
+    // Abre o arquivo de dados para leitura e o de indice para escrita
+    FILE *dataFile = fopen(dataFilename, "r");
+    alloc_check(dataFile, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(bTreeFilename, "w+");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho do arquivo de dados
+    linha_header *linhaHeader = read_binary_linha_header(dataFile);
+    // Inicializa o cabecalho do qruivo de indice com status inconsistente
+    bTree_header *bTreeHeader = calloc(1, sizeof(bTree_header));
+    bTreeHeader->status = '0';
+    bTreeHeader->noRaiz = -1;
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    // Le registro por registro do arquivo de dados
+    // e insere as chaves no arquivo de indice
+    int totalDeRegistros = linhaHeader->nroRegistros + linhaHeader->nroRegRemovidos;
+    for(int i = 0; i < totalDeRegistros; i++)
+    {
+        long long int reference = ftell(dataFile);
+        linha_data *data = read_binary_linha_data(dataFile);
+        // Verifica se nao esta logicamente removido
+        if(data->removido == '1')
+            insert(data->codLinha, reference, bTreeHeader, bTreeFile);
+        else
+            fseek(dataFile, data->tamanhoRegistro, SEEK_CUR);
+        free(data);
+    }
+
+    // Muda o estado do arquivo para consistente e atualiza cabecalho
+    bTreeHeader->status = '1';
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    
+    free(linhaHeader);
+    free(bTreeHeader);
+    fclose(dataFile);
+    fclose(bTreeFile);
+    binarioNaTela(bTreeFilename);
 }
 
 
@@ -478,7 +460,7 @@ void comando_11()
 
     // Pesquisa pela chave no arquivo de indice e retorna a referencia
     int key = convertePrefixo(prefix);
-    long int ref;
+    long long int ref;
     int res = search(bTreeHeader->noRaiz, key, bTreeFile, &ref);
 
     // Verifica se encontrou
@@ -491,6 +473,7 @@ void comando_11()
         veiculo_data *data = read_binary_veiculo_data(dataFile);
         // Imprime
         print_veiculo_data(dataHeader, data);
+        printf("\n");
         free(data);
     }
 
@@ -524,7 +507,7 @@ void comando_12()
     bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
 
     // Pesquisa pela chave no arquivo de indice e retorna a referencia
-    long int ref;
+    long long int ref;
     int res = search(bTreeHeader->noRaiz, codLinha, bTreeFile, &ref);
 
     // Verifica se encontrou
@@ -537,6 +520,7 @@ void comando_12()
         linha_data *data = read_binary_linha_data(dataFile);
         // Imprime
         print_linha_data(dataHeader, data);
+        printf("\n");
         free(data);
     }
 
@@ -545,4 +529,112 @@ void comando_12()
     fclose(bTreeFile);
     free(dataHeader);
     free(bTreeHeader);
+}
+
+
+void comando_13()
+{
+    /**
+     * Extensao do comando 7: Usado para ler entradas da entrada padrao e escrever no arquivo binario de veiculo, 
+     * guardando as chaves e referencias em um arquivo de indice arcore-B
+    */
+
+    // Recebe as entradas do comando
+    char dataFilename[128], bTreeFilename[128], prefix[128];
+    int n;
+    scanf("%s %s %d", dataFilename, bTreeFilename, &n);
+
+    // Abre arquivos binario para leitura
+    FILE *dataFile = fopen(dataFilename, "r+");
+    alloc_check(dataFile, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(bTreeFilename, "r+");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalhos
+    veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);
+    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+
+    // Arquivos incosistenets
+    dataHeader->status = '0';
+    bTreeHeader->status = '0';
+    update_binary_veiculo_header(dataHeader, dataFile);
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    // Le veiculo por veiculo da entrada padrao (stdin) e escreve no binario
+    veiculo_data *data;
+    for(int i = 0; i < n; i++){
+        // INsere no arquivo de dados veiculo
+        long long int reference = dataHeader->byteProxReg;
+        data = read_stdin_veiculo_data(dataHeader);
+        append_binary_veiculo_data(dataHeader, data, dataFile);
+        // Insere no arquivo de indice
+        insert(convertePrefixo(data->prefixo), reference, bTreeHeader, bTreeFile);
+        free(data);
+    }
+
+    // Coloca oS arquivo como consistenteS e atualiza o header
+    dataHeader->status = '1';
+    bTreeHeader->status = '1';
+    update_binary_veiculo_header(dataHeader, dataFile);
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    fclose(dataFile);
+    fclose(bTreeFile);
+    free(dataHeader);
+    free(bTreeHeader);
+    binarioNaTela(bTreeFilename);
+}
+
+
+void comando_14()
+{
+    /**
+     * Extensao do comando 8: Usado para ler entradas da entrada padrao e escrever no arquivo binario de linha, 
+     * guardando as chaves e referencias em um arquivo de indice arcore-B
+    */
+
+    // Recebe as entradas do comando
+    char dataFilename[128], bTreeFilename[128], prefix[128];
+    int n;
+    scanf("%s %s %d", dataFilename, bTreeFilename, &n);
+
+    // Abre arquivos binario para leitura
+    FILE *dataFile = fopen(dataFilename, "r+");
+    alloc_check(dataFile, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(bTreeFilename, "r+");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalhos
+    linha_header *dataHeader = read_binary_linha_header(dataFile);
+    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+
+    // Arquivos incosistenets
+    dataHeader->status = '0';
+    bTreeHeader->status = '0';
+    update_binary_linha_header(dataHeader, dataFile);
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    // Le linha por linha da entrada padrao (stdin) e escreve no binario
+    linha_data *data;
+    for(int i = 0; i < n; i++){
+        // INsere no arquivo de dados linha
+        long long int reference = dataHeader->byteProxReg;
+        data = read_stdin_linha_data(dataHeader);
+        append_binary_linha_data(dataHeader, data, dataFile);
+        // Insere no arquivo de indice
+        insert(data->codLinha, reference, bTreeHeader, bTreeFile);
+        free(data);
+    }
+
+    // Coloca oS arquivo como consistenteS e atualiza o header
+    dataHeader->status = '1';
+    bTreeHeader->status = '1';
+    update_binary_linha_header(dataHeader, dataFile);
+    update_bTree_header(bTreeHeader, bTreeFile);
+
+    fclose(dataFile);
+    fclose(bTreeFile);
+    free(dataHeader);
+    free(bTreeHeader);
+    binarioNaTela(bTreeFilename);
 }
