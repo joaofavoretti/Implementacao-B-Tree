@@ -354,7 +354,7 @@ void comando_9()
     BTree_header *bTreeHeader = calloc(1, sizeof(BTree_header));
     bTreeHeader->status = '0';
     bTreeHeader->noRaiz = -1;
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     // Le registro por registro do arquivo de dados
     // e insere as chaves no arquivo de indice
@@ -373,7 +373,7 @@ void comando_9()
 
     // Muda o estado do arquivo para consistente e atualiza cabecalho
     bTreeHeader->status = '1';
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     
     free(veiculoHeader);
@@ -406,7 +406,7 @@ void comando_10()
     BTree_header *bTreeHeader = calloc(1, sizeof(BTree_header));
     bTreeHeader->status = '0';
     bTreeHeader->noRaiz = -1;
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     // Le registro por registro do arquivo de dados
     // e insere as chaves no arquivo de indice
@@ -425,7 +425,7 @@ void comando_10()
 
     // Muda o estado do arquivo para consistente e atualiza cabecalho
     bTreeHeader->status = '1';
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     
     free(linhaHeader);
@@ -456,7 +456,7 @@ void comando_11()
 
     // Le cabecalhos
     veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);
-    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_btree_header(bTreeFile);
 
     // Pesquisa pela chave no arquivo de indice e retorna a referencia
     int key = convertePrefixo(prefix);
@@ -504,7 +504,7 @@ void comando_12()
 
     // Le cabecalhos
     linha_header *dataHeader = read_binary_linha_header(dataFile);
-    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_btree_header(bTreeFile);
 
     // Pesquisa pela chave no arquivo de indice e retorna a referencia
     long long int ref;
@@ -552,13 +552,13 @@ void comando_13()
 
     // Le cabecalhos
     veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);
-    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_btree_header(bTreeFile);
 
     // Arquivos incosistenets
     dataHeader->status = '0';
     bTreeHeader->status = '0';
     update_binary_veiculo_header(dataHeader, dataFile);
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     // Le veiculo por veiculo da entrada padrao (stdin) e escreve no binario
     veiculo_data *data;
@@ -576,7 +576,7 @@ void comando_13()
     dataHeader->status = '1';
     bTreeHeader->status = '1';
     update_binary_veiculo_header(dataHeader, dataFile);
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     fclose(dataFile);
     fclose(bTreeFile);
@@ -606,13 +606,13 @@ void comando_14()
 
     // Le cabecalhos
     linha_header *dataHeader = read_binary_linha_header(dataFile);
-    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_btree_header(bTreeFile);
 
     // Arquivos incosistenets
     dataHeader->status = '0';
     bTreeHeader->status = '0';
     update_binary_linha_header(dataHeader, dataFile);
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     // Le linha por linha da entrada padrao (stdin) e escreve no binario
     linha_data *data;
@@ -630,7 +630,7 @@ void comando_14()
     dataHeader->status = '1';
     bTreeHeader->status = '1';
     update_binary_linha_header(dataHeader, dataFile);
-    update_bTree_header(bTreeHeader, bTreeFile);
+    write_btree_header(bTreeHeader, bTreeFile);
 
     fclose(dataFile);
     fclose(bTreeFile);
