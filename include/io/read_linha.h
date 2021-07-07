@@ -4,8 +4,8 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#ifndef _LINHA_READ_H_
-#define _LINHA_READ_H_
+#ifndef INCLUDE_IO_LINHA_READ_H
+#define INCLUDE_IO_LINHA_READ_H
 
 #include <util.h>
 #include <stdio.h>

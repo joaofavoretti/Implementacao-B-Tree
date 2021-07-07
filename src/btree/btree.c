@@ -4,7 +4,7 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#include <b_tree.h>
+#include <btree/btree.h>
 #include <util.h>
 
 bTree_header *read_bTree_header(FILE *bTree)

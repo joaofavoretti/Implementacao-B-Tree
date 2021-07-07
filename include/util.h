@@ -4,8 +4,8 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#ifndef _UTIL_H_
-#define _UTIL_H_
+#ifndef INCLUDE_UTIL_H
+#define INCLUDE_UTIL_H
 
 #define ALLOC_NULL_POINTER 0
 #define FAIL_BINARY_STATUS 0
@@ -23,6 +23,5 @@ int is_null_field(char *field);
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 int convertePrefixo(char* str);
-
 
 #endif

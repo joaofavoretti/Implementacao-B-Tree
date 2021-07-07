@@ -4,8 +4,8 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#include <read_veiculo.h>
-#include <write_veiculo.h>
+#include <io/read_veiculo.h>
+#include <io/write_veiculo.h>
 #include <util.h>
 #include <stdio.h>
 #include <stdlib.h>

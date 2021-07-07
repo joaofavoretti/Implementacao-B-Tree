@@ -4,11 +4,11 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#ifndef _PRINT_REGISTER_
-#define _PRINT_REGISTER_
+#ifndef INCLUDE_PRINT_REGISTER
+#define INCLUDE_PRINT_REGISTER
 
-#include <read_veiculo.h>
-#include <read_linha.h>
+#include <io/read_veiculo.h>
+#include <io/read_linha.h>
 #include <stdlib.h>
 #include <string.h>
 

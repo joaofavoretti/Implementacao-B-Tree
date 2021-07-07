@@ -4,19 +4,19 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#ifndef _COMANDOS_H_
-#define _COMANDOS_H_
+#ifndef INCLUDE_COMANDOS_H
+#define INCLUDE_COMANDOS_H
 
-#include <read_veiculo.h>
-#include <read_linha.h>
-#include <write_veiculo.h>
-#include <write_linha.h>
+#include <io/read_veiculo.h>
+#include <io/read_linha.h>
+#include <io/write_veiculo.h>
+#include <io/write_linha.h>
 #include <print_register.h>
 #include <util.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <b_tree.h>
+#include <btree/btree.h>
 
 void comando_1();
 void comando_2();

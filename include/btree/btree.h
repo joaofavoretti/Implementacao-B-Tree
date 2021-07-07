@@ -4,8 +4,8 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#ifndef _B_TREE_H_
-#define _B_TREE_H_
+#ifndef INCLUDE_BTREE_BTREE_H
+#define INCLUDE_BTREE_BTREE_H
 
 #include <stdio.h>
 

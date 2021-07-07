@@ -4,7 +4,7 @@
  * Nome: Lucas Pilla (10633328)
  */
 
-#include <write_linha.h>
+#include <io/write_linha.h>
 
 void update_binary_linha_header(linha_header *header, FILE *binFilePointer)
 {
