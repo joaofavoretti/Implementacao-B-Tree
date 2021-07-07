@@ -351,7 +351,7 @@ void comando_9()
     // Le cabecalho do arquivo de dados
     veiculo_header *veiculoHeader = read_binary_veiculo_header(dataFile);
     // Inicializa o cabecalho do qruivo de indice com status inconsistente
-    bTree_header *bTreeHeader = calloc(1, sizeof(bTree_header));
+    BTree_header *bTreeHeader = calloc(1, sizeof(BTree_header));
     bTreeHeader->status = '0';
     bTreeHeader->noRaiz = -1;
     update_bTree_header(bTreeHeader, bTreeFile);
@@ -403,7 +403,7 @@ void comando_10()
     // Le cabecalho do arquivo de dados
     linha_header *linhaHeader = read_binary_linha_header(dataFile);
     // Inicializa o cabecalho do qruivo de indice com status inconsistente
-    bTree_header *bTreeHeader = calloc(1, sizeof(bTree_header));
+    BTree_header *bTreeHeader = calloc(1, sizeof(BTree_header));
     bTreeHeader->status = '0';
     bTreeHeader->noRaiz = -1;
     update_bTree_header(bTreeHeader, bTreeFile);
@@ -456,7 +456,7 @@ void comando_11()
 
     // Le cabecalhos
     veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);
-    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
 
     // Pesquisa pela chave no arquivo de indice e retorna a referencia
     int key = convertePrefixo(prefix);
@@ -504,7 +504,7 @@ void comando_12()
 
     // Le cabecalhos
     linha_header *dataHeader = read_binary_linha_header(dataFile);
-    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
 
     // Pesquisa pela chave no arquivo de indice e retorna a referencia
     long long int ref;
@@ -552,7 +552,7 @@ void comando_13()
 
     // Le cabecalhos
     veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);
-    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
 
     // Arquivos incosistenets
     dataHeader->status = '0';
@@ -606,7 +606,7 @@ void comando_14()
 
     // Le cabecalhos
     linha_header *dataHeader = read_binary_linha_header(dataFile);
-    bTree_header *bTreeHeader = read_bTree_header(bTreeFile);
+    BTree_header *bTreeHeader = read_bTree_header(bTreeFile);
 
     // Arquivos incosistenets
     dataHeader->status = '0';
