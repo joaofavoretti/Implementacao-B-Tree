@@ -339,22 +339,22 @@ void comando_9()
      *  para o arquivo de dados veiculo 
      */
 
-    char dataFilename[128], bTreeFilename[128];         /* Recebe as primeiras duas entradas depois do comando  */
-    scanf("%s %s", dataFilename, bTreeFilename);        /* ex entrada: 9 veiculo.bin indicePrefixo.bin          */
+    char dataFilename[128], BTreeFilename[128];         /* Recebe as primeiras duas entradas depois do comando  */
+    scanf("%s %s", dataFilename, BTreeFilename);        /* ex entrada: 9 veiculo.bin indicePrefixo.bin          */
 
     FILE *dataFile = fopen(dataFilename, "r");                      /* Abre arquivo de dados para leitura */
     alloc_check(dataFile, "Falha no processamento do arquivo.\n");
 
-    FILE *bTreeFile = fopen(bTreeFilename, "w+");                   /* Abre arquivo do indice para escrita */
-    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+    FILE *BTreeFile = fopen(BTreeFilename, "w+");                   /* Abre arquivo do indice para escrita */
+    alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
     veiculo_header *veiculoHeader = read_binary_veiculo_header(dataFile);   /* Lê o cabeçalho do arquivo veiculo */
 
-    BTree_header *bTreeHeader = calloc(1, sizeof(BTree_header));    /* Inicializa o cabecalho do arquivo de indice  */
-    bTreeHeader->status = '0';                                      /*  com staus inconsistente                     */
-    bTreeHeader->noRaiz = -1;
+    BTree_header *BTreeHeader = calloc(1, sizeof(BTree_header));    /* Inicializa o cabecalho do arquivo de indice  */
+    BTreeHeader->status = '0';                                      /*  com staus inconsistente                     */
+    BTreeHeader->noRaiz = -1;
 
-    write_btree_header(bTreeHeader, bTreeFile);                      /* Atualiza o arquivo de indice com o cabecalho */
+    write_btree_header(BTreeHeader, BTreeFile);                      /* Atualiza o arquivo de indice com o cabecalho */
 
     int totalDeRegistros = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;    /* Le registro por registro do   */
     for(int i = 0; i < totalDeRegistros; i++)                                               /*  arquivo de dados e insere as */
@@ -364,7 +364,7 @@ void comando_9()
         veiculo_data *data = read_binary_veiculo_data(dataFile);
 
         if(data->removido == '1'){                                                      /* Se o registro não estiver removido */
-            insert(convertePrefixo(data->prefixo), reference, bTreeHeader, bTreeFile);  /*  insere no indice                  */
+            insert(convertePrefixo(data->prefixo), reference, BTreeHeader, BTreeFile);  /*  insere no indice                  */
         } else {                                                                        /* Caso o contrario, pula para o      */
             fseek(dataFile, data->tamanhoRegistro, SEEK_CUR);                           /*  próximo registro de veiculo       */
         }
@@ -372,14 +372,14 @@ void comando_9()
         free(data);
     }
 
-    bTreeHeader->status = '1';                  /* Atualiza o status do arquivo     */
-    write_btree_header(bTreeHeader, bTreeFile); /* Atualiza o cabecalho do arquivo  */
+    BTreeHeader->status = '1';                  /* Atualiza o status do arquivo     */
+    write_btree_header(BTreeHeader, BTreeFile); /* Atualiza o cabecalho do arquivo  */
     
     free(veiculoHeader);
-    free(bTreeHeader);
+    free(BTreeHeader);
     fclose(dataFile);
-    fclose(bTreeFile);
-    binarioNaTela(bTreeFilename);
+    fclose(BTreeFile);
+    binarioNaTela(BTreeFilename);
 }
 
 
@@ -390,22 +390,22 @@ void comando_10()
      *  para o arquivo de dados linha 
      */
     // Recebe as entradas do comando
-    char dataFilename[128], bTreeFilename[128];         /* Recebe as primeiras duas entradas depois do comando  */
-    scanf("%s %s", dataFilename, bTreeFilename);        /* ex entrada: 10 linha.bin indicePrefixo.bin           */
+    char dataFilename[128], BTreeFilename[128];         /* Recebe as primeiras duas entradas depois do comando  */
+    scanf("%s %s", dataFilename, BTreeFilename);        /* ex entrada: 10 linha.bin indicePrefixo.bin           */
 
     FILE *dataFile = fopen(dataFilename, "r");                      /* Abre arquivo de dados para leitura */
     alloc_check(dataFile, "Falha no processamento do arquivo.\n");
 
-    FILE *bTreeFile = fopen(bTreeFilename, "w+");                   /* Abre arquivo do indice para escrita */
-    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+    FILE *BTreeFile = fopen(BTreeFilename, "w+");                   /* Abre arquivo do indice para escrita */
+    alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
     linha_header *linhaHeader = read_binary_linha_header(dataFile); /* Lê o cabeçalho do arquivo linha */
 
-    BTree_header *bTreeHeader = calloc(1, sizeof(BTree_header));    /* Inicializa o cabecalho do arquivo de indice  */
-    bTreeHeader->status = '0';                                      /*  com staus inconsistente                     */
-    bTreeHeader->noRaiz = -1;
+    BTree_header *BTreeHeader = calloc(1, sizeof(BTree_header));    /* Inicializa o cabecalho do arquivo de indice  */
+    BTreeHeader->status = '0';                                      /*  com staus inconsistente                     */
+    BTreeHeader->noRaiz = -1;
    
-    write_btree_header(bTreeHeader, bTreeFile);                     /* Atualiza o arquivo de indice com o cabecalho */
+    write_btree_header(BTreeHeader, BTreeFile);                     /* Atualiza o arquivo de indice com o cabecalho */
 
     int totalDeRegistros = linhaHeader->nroRegistros + linhaHeader->nroRegRemovidos;    /* Le registro por registro do   */
     for(int i = 0; i < totalDeRegistros; i++)                                           /*  arquivo de dados e insere as */
@@ -415,20 +415,20 @@ void comando_10()
         linha_data *data = read_binary_linha_data(dataFile);
         
         if(data->removido == '1')                                           /* Se o registro não estiver removido */
-            insert(data->codLinha, reference, bTreeHeader, bTreeFile);      /*  insere no indice                  */
+            insert(data->codLinha, reference, BTreeHeader, BTreeFile);      /*  insere no indice                  */
         else                                                                /* Caso o contrario, pula para o      */
             fseek(dataFile, data->tamanhoRegistro, SEEK_CUR);               /*  próximo registro de veiculo       */
         free(data);
     }
 
-    bTreeHeader->status = '1';                      /* Atualiza o status do arquivo     */
-    write_btree_header(bTreeHeader, bTreeFile);     /* Atualiza o cabecalho do arquivo  */
+    BTreeHeader->status = '1';                      /* Atualiza o status do arquivo     */
+    write_btree_header(BTreeHeader, BTreeFile);     /* Atualiza o cabecalho do arquivo  */
 
     free(linhaHeader);
-    free(bTreeHeader);
+    free(BTreeHeader);
     fclose(dataFile);
-    fclose(bTreeFile);
-    binarioNaTela(bTreeFilename);
+    fclose(BTreeFile);
+    binarioNaTela(BTreeFilename);
 }
 
 
@@ -439,23 +439,23 @@ void comando_11()
      *  pelo campo prefixo
      */
 
-    char dataFilename[128], bTreeFilename[128], prefix[128];    /* Recebe as primeiras duas entradas depois do comando          */
-    scanf("%s %s prefixo ", dataFilename, bTreeFilename);       /* ex entrada: 11 veiculo.bin indicePrefixo.bin prefixo "GD343" */
+    char dataFilename[128], BTreeFilename[128], prefix[128];    /* Recebe as primeiras duas entradas depois do comando          */
+    scanf("%s %s prefixo ", dataFilename, BTreeFilename);       /* ex entrada: 11 veiculo.bin indicePrefixo.bin prefixo "GD343" */
     scan_quote_string(prefix);      
 
     FILE *dataFile = fopen(dataFilename, "r");                      /* Abre arquivo de dados para leitura */
     alloc_check(dataFile, "Falha no processamento do arquivo.\n");
 
-    FILE *bTreeFile = fopen(bTreeFilename, "r");                    /* Abre arquivo do indice para leitura */
-    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+    FILE *BTreeFile = fopen(BTreeFilename, "r");                    /* Abre arquivo do indice para leitura */
+    alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
     veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);  /* Lê o cabeçalho do arquivo veiculo   */
 
-    BTree_header *bTreeHeader = read_btree_header(bTreeFile);           /* Lê o cabeçalho do arquivo de indice */
+    BTree_header *BTreeHeader = read_btree_header(BTreeFile);           /* Lê o cabeçalho do arquivo de indice */
 
     int key = convertePrefixo(prefix);                              /* Converte o prefixo para um modo      */
     long long int ref;                                              /*  indexado à inteiros                 */
-    int res = search(bTreeHeader->noRaiz, key, bTreeFile, &ref);    /* Busca o prefixo no arquivo de indice */
+    int res = search(BTreeHeader->noRaiz, key, BTreeFile, &ref);    /* Busca o prefixo no arquivo de indice */
 
     if(res == NOT_FOUND)                    /* Caso não tenha encontrado */
         printf("Registro inexistente.\n");
@@ -470,9 +470,9 @@ void comando_11()
     }
 
     fclose(dataFile);
-    fclose(bTreeFile);
+    fclose(BTreeFile);
     free(dataHeader);
-    free(bTreeHeader);
+    free(BTreeHeader);
 }
 
 void comando_12()
@@ -483,22 +483,22 @@ void comando_12()
      */
 
     int codLinha;
-    char dataFilename[128], bTreeFilename[128];                             /* Recebe as primeiras duas entradas depois do comando       */
-    scanf("%s %s codLinha %d", dataFilename, bTreeFilename, &codLinha);     /* ex entrada: 12 linha.bin indicePrefixo.bin codLinha 659   */
+    char dataFilename[128], BTreeFilename[128];                             /* Recebe as primeiras duas entradas depois do comando       */
+    scanf("%s %s codLinha %d", dataFilename, BTreeFilename, &codLinha);     /* ex entrada: 12 linha.bin indicePrefixo.bin codLinha 659   */
 
     FILE *dataFile = fopen(dataFilename, "r");                      /* Abre arquivo de dados para leitura */
     alloc_check(dataFile, "Falha no processamento do arquivo.\n");
 
-    FILE *bTreeFile = fopen(bTreeFilename, "r");                    /* Abre arquivo do indice para leitura */
-    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+    FILE *BTreeFile = fopen(BTreeFilename, "r");                    /* Abre arquivo do indice para leitura */
+    alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
     // Le cabecalhos
     linha_header *dataHeader = read_binary_linha_header(dataFile);  /* Lê o cabeçalho do arquivo linha */
 
-    BTree_header *bTreeHeader = read_btree_header(bTreeFile);       /* Lê o cabeçalho do arquivo de indice */
+    BTree_header *BTreeHeader = read_btree_header(BTreeFile);       /* Lê o cabeçalho do arquivo de indice */
 
     long long int ref;
-    int res = search(bTreeHeader->noRaiz, codLinha, bTreeFile, &ref);   /* Busca o prefixo no arquivo de indice */
+    int res = search(BTreeHeader->noRaiz, codLinha, BTreeFile, &ref);   /* Busca o prefixo no arquivo de indice */
 
     if(res == NOT_FOUND)                    /* Caso não tenha encontrado */
         printf("Registro inexistente.\n");
@@ -513,9 +513,9 @@ void comando_12()
     }
 
     fclose(dataFile);
-    fclose(bTreeFile);
+    fclose(BTreeFile);
     free(dataHeader);
-    free(bTreeHeader);
+    free(BTreeHeader);
 }
 
 
@@ -527,25 +527,25 @@ void comando_13()
     */
 
     int n;      /* Armazenar o numero de entradas */
-    char dataFilename[128], bTreeFilename[128], prefix[128];    /* Recebe as primeiras duas entradas depois do comando */
-    scanf("%s %s %d", dataFilename, bTreeFilename, &n);         /* ex entrada: 13 veiculo.bin indicePrefixo.bin 4      */
+    char dataFilename[128], BTreeFilename[128], prefix[128];    /* Recebe as primeiras duas entradas depois do comando */
+    scanf("%s %s %d", dataFilename, BTreeFilename, &n);         /* ex entrada: 13 veiculo.bin indicePrefixo.bin 4      */
 
     FILE *dataFile = fopen(dataFilename, "r+");                     /* Abre arquivo de dados para leitura e escrita */
     alloc_check(dataFile, "Falha no processamento do arquivo.\n");
 
-    FILE *bTreeFile = fopen(bTreeFilename, "r+");                   /* Abre arquivo do indice para leitura e escrita */
-    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+    FILE *BTreeFile = fopen(BTreeFilename, "r+");                   /* Abre arquivo do indice para leitura e escrita */
+    alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
     veiculo_header *dataHeader = read_binary_veiculo_header(dataFile);  /* Lê o cabeçalho do arquivo veiculo */
 
-    BTree_header *bTreeHeader = read_btree_header(bTreeFile);           /* Lê o cabeçalho do arquivo de indice */
+    BTree_header *BTreeHeader = read_btree_header(BTreeFile);           /* Lê o cabeçalho do arquivo de indice */
 
     dataHeader->status = '0';           /* Atribui inconscistencia nos arquivos*/
-    bTreeHeader->status = '0';
+    BTreeHeader->status = '0';
 
     update_binary_veiculo_header(dataHeader, dataFile); /* Atualiza o header do arquivo de veiculo */
 
-    write_btree_header(bTreeHeader, bTreeFile);         /* Atualiza o arquivo de indice */
+    write_btree_header(BTreeHeader, BTreeFile);         /* Atualiza o arquivo de indice */
 
     veiculo_data *data;
     for(int i = 0; i < n; i++){                                 /* Para cada novo registro lido da entrada padrão  */
@@ -554,20 +554,20 @@ void comando_13()
 
         append_binary_veiculo_data(dataHeader, data, dataFile);
 
-        insert(convertePrefixo(data->prefixo), reference, bTreeHeader, bTreeFile);
+        insert(convertePrefixo(data->prefixo), reference, BTreeHeader, BTreeFile);
         free(data);
     }
 
     dataHeader->status = '1';                           /* Altera o status do arquivo  */
-    bTreeHeader->status = '1';                          /*  e atualiza o header dos    */
+    BTreeHeader->status = '1';                          /*  e atualiza o header dos    */
     update_binary_veiculo_header(dataHeader, dataFile); /*  arquivo de veiculo e indice*/
-    write_btree_header(bTreeHeader, bTreeFile);
+    write_btree_header(BTreeHeader, BTreeFile);
 
     fclose(dataFile);
-    fclose(bTreeFile);
+    fclose(BTreeFile);
     free(dataHeader);
-    free(bTreeHeader);
-    binarioNaTela(bTreeFilename);
+    free(BTreeHeader);
+    binarioNaTela(BTreeFilename);
 }
 
 
@@ -579,25 +579,25 @@ void comando_14()
     */
 
     int n;      /* Armazenar o numero de entradas */
-    char dataFilename[128], bTreeFilename[128], prefix[128];    /* Recebe as primeiras duas entradas depois do comando */
-    scanf("%s %s %d", dataFilename, bTreeFilename, &n);         /* ex entrada: 14 linha.bin indicePrefixo.bin 4        */
+    char dataFilename[128], BTreeFilename[128], prefix[128];    /* Recebe as primeiras duas entradas depois do comando */
+    scanf("%s %s %d", dataFilename, BTreeFilename, &n);         /* ex entrada: 14 linha.bin indicePrefixo.bin 4        */
 
     FILE *dataFile = fopen(dataFilename, "r+");                     /* Abre arquivo de dados para leitura e escrita */
     alloc_check(dataFile, "Falha no processamento do arquivo.\n");
 
-    FILE *bTreeFile = fopen(bTreeFilename, "r+");                   /* Abre arquivo do indice para leitura e escrita */
-    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+    FILE *BTreeFile = fopen(BTreeFilename, "r+");                   /* Abre arquivo do indice para leitura e escrita */
+    alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
     linha_header *dataHeader = read_binary_linha_header(dataFile);  /* Lê o cabeçalho do arquivo veiculo */
 
-    BTree_header *bTreeHeader = read_btree_header(bTreeFile);       /* Lê o cabeçalho do arquivo de indice */
+    BTree_header *BTreeHeader = read_btree_header(BTreeFile);       /* Lê o cabeçalho do arquivo de indice */
 
     dataHeader->status = '0';               /* Atribui inconscistencia nos arquivos*/
-    bTreeHeader->status = '0';
+    BTreeHeader->status = '0';
 
     update_binary_linha_header(dataHeader, dataFile);   /* Atualiza o header do arquivo de linha */
 
-    write_btree_header(bTreeHeader, bTreeFile);          /* Atualiza o arquivo de indice */
+    write_btree_header(BTreeHeader, BTreeFile);          /* Atualiza o arquivo de indice */
 
     linha_data *data;
     for(int i = 0; i < n; i++){                             /* Para cada novo registro lido da entrada padrão   */
@@ -606,18 +606,18 @@ void comando_14()
         
         append_binary_linha_data(dataHeader, data, dataFile);
 
-        insert(data->codLinha, reference, bTreeHeader, bTreeFile);
+        insert(data->codLinha, reference, BTreeHeader, BTreeFile);
         free(data);
     }
 
     dataHeader->status = '1';                           /* Altera o status do arquivo */
-    bTreeHeader->status = '1';                          /*  e atualiza o header dos   */
+    BTreeHeader->status = '1';                          /*  e atualiza o header dos   */
     update_binary_linha_header(dataHeader, dataFile);   /*  arquivo de linha e indice */
-    write_btree_header(bTreeHeader, bTreeFile);
+    write_btree_header(BTreeHeader, BTreeFile);
 
     fclose(dataFile);
-    fclose(bTreeFile);
+    fclose(BTreeFile);
     free(dataHeader);
-    free(bTreeHeader);
-    binarioNaTela(bTreeFilename);
+    free(BTreeHeader);
+    binarioNaTela(BTreeFilename);
 }

@@ -47,21 +47,22 @@ typedef struct {                /* Struct para armazenar um registro de dados do
 } BTree_page;
 
 /* btree/io.c */
-BTree_header *read_btree_header(FILE *bTree);
-BTree_page *read_btree_page(int RNN, FILE *bTree);
-void write_btree_header(BTree_header *header, FILE *bTree);
-void write_btree_page(int RNN, BTree_page *page, FILE *bTree);
+BTree_header *read_btree_header(FILE *BTree);
+BTree_page *read_btree_page(int RNN, FILE *BTree);
+void write_btree_header(BTree_header *header, FILE *BTree);
+void write_btree_page(int RNN, BTree_page *page, FILE *BTree);
 
 /* btree/util.c*/
-void create_root(BTree_pair *pair, int left, int rigth, BTree_header *header, FILE *bTree);
+void create_root(BTree_pair *pair, int left, int right, BTree_header *header, FILE *BTree);
+void page_init(BTree_page *page);
 BTree_page *split(BTree_page *page, BTree_pair *pair, int *promotedRNN, int nextRNN);
 
 /* btree/search.c */
-int search(int RNN, int key, FILE *bTree, long long int *reference);
+int search(int RNN, int key, FILE *BTree, long long int *reference);
 
 /* btree/insert.c */
 void insertion(BTree_page *page, BTree_pair *pair, int promotedRNN);
-int insert_procedure(int RNN, BTree_header *header, FILE *bTree, BTree_pair *promotedPair, int *promotedRNN);
-void insert(int key, long long int reference, BTree_header *header, FILE *bTree);
+int insert_procedure(int RNN, BTree_header *header, FILE *BTree, BTree_pair *promotedPair, int *promotedRNN);
+void insert(int key, long long int reference, BTree_header *header, FILE *BTree);
 
 #endif
