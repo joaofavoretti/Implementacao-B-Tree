@@ -21,10 +21,6 @@ void insertion(BTree_page *page, BTree_pair *pair, int promotedRNN){
     page->nroChavesIndexadas += 1;
 }
 
-
-
-
-
 int insert_procedure(int RNN, BTree_header *header, FILE *bTree, BTree_pair *promotedPair, int *promotedRNN)
 {
     // Promove a chave original quando atinge o no folha
