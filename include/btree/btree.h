@@ -2,7 +2,15 @@
  * Trabalho Prático 2 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
- */
+ *
+///////////////////////////////////////////////////
+ *
+ * btree/btree.h
+ *  
+ *  Arquivo header contendo as declarações necessárias para as
+ *      funções relacionados ao arquivo de indice no formato B-Tree
+ * 
+*/
 
 #ifndef INCLUDE_BTREE_BTREE_H
 #define INCLUDE_BTREE_BTREE_H
