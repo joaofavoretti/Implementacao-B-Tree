@@ -1,13 +1,13 @@
 /**
- * Trabalho Prático 1 - Organizacao de Arquivos
+ * Trabalho Prático 2 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
  */
 
-#ifndef _WRITE_VEICULO_H_
-#define _WRITE_VEICULO_H_
+#ifndef INCLUDE_IO_WRITE_VEICULO_H
+#define INCLUDE_IO_WRITE_VEICULO_H
 
-#include <read_veiculo.h>
+#include <io/read_veiculo.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
