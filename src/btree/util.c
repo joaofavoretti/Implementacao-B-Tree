@@ -26,9 +26,11 @@
  *      left e right.
  * 
  *  Argumentos:
- *      page  -- Página em ram que será inserido a chave
- *      pair -- Par chave-referencia que será inserido na chave
- *      promotedRRN  -- RRN que é inserido adjacente à chave na pagina
+ *      pair -- Par chave-referencia que será inserido na pagina
+ *      left -- Ponteiro à esquerda para outra pagina da btree
+ *      right -- Ponteiro à direita para outra pagina da btree
+ *      header -- Estrutura com cabecalho do arquivo de indice
+ *      BTree -- Ponteiro para o arquivo de indice
  */
 void create_root(BTree_pair *pair, int left, int right, BTree_header *header, FILE *BTree)
 {
@@ -84,6 +86,7 @@ void page_init(BTree_page *page) {
  *      page  -- Página em ram que será inserido a chave
  *      pair -- Par chave-referencia que será inserido na chave
  *      promotedRRN  -- RRN que é inserido adjacente à chave na pagina
+ *      nextRRN -- Numero do RRN da página criada
  */
 BTree_page *split(BTree_page *page, BTree_pair *pair, int *promotedRNN, int nextRNN){
 
@@ -110,8 +113,6 @@ BTree_page *split(BTree_page *page, BTree_pair *pair, int *promotedRNN, int next
 
     newPage = malloc(sizeof(BTree_page));
     page_init(newPage);
-
-    
 
     for(i = 0; i < MINKEYS; i++){                       /* Move a primeira metade das chaves e ponteiros */
         page->c[i].key = c_temp[i].key;                 /*  para a página antiga. E a segunda metade das */

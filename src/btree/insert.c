@@ -123,7 +123,7 @@ void insert(int key, long long int reference, BTree_header *header, FILE *BTree)
     result = insert_procedure(header->noRaiz, header, BTree, &pair, &promotedRNN);  /* Chamada do procedimento de    */
                                                                                     /*  de inserção utilizando o nó  */
                                                                                     /*  raiz como inicio da recursão */
-    
+
     if (result == PROMOTED) {   /* Caso haja promoção até à página raiz, uma nova pagina raiz é criada */
         create_root(&pair, header->noRaiz, promotedRNN, header, BTree);
     }

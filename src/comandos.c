@@ -389,7 +389,7 @@ void comando_10()
      *  Esse comando permitir criar um arquivo de indice (arvore-B)
      *  para o arquivo de dados linha 
      */
-    // Recebe as entradas do comando
+
     char dataFilename[128], BTreeFilename[128];         /* Recebe as primeiras duas entradas depois do comando  */
     scanf("%s %s", dataFilename, BTreeFilename);        /* ex entrada: 10 linha.bin indicePrefixo.bin           */
 
@@ -492,7 +492,6 @@ void comando_12()
     FILE *BTreeFile = fopen(BTreeFilename, "r");                    /* Abre arquivo do indice para leitura */
     alloc_check(BTreeFile, "Falha no processamento do arquivo.\n");
 
-    // Le cabecalhos
     linha_header *dataHeader = read_binary_linha_header(dataFile);  /* Lê o cabeçalho do arquivo linha */
 
     BTree_header *BTreeHeader = read_btree_header(BTreeFile);       /* Lê o cabeçalho do arquivo de indice */

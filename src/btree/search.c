@@ -30,7 +30,7 @@
  */
 int search(int RNN, int key, FILE *BTree, long long int *reference)
 {
-    if(RNN == NIL){         /* Caso RRN não seja uma referencia para outra pagina  */
+    if(RNN == NIL) {        /* Caso RRN não seja uma referencia para outra pagina  */
         *reference = NIL;   /*  da BTree (NIL), então não existe a chave dentro do */
         return NOT_FOUND;   /*  arquivo de indice.                                 */
     }
