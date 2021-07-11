@@ -11,7 +11,7 @@
 #include <io/read_linha.h>
 #include <io/write_veiculo.h>
 #include <io/write_linha.h>
-#include <print_register.h>
+#include <io/print_register.h>
 #include <util.h>
 #include <stdio.h>
 #include <stdlib.h>
