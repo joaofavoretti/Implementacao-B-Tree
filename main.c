@@ -76,6 +76,26 @@ int main(int argc, char **argv) {
         case 14:
             comando_14();
             break;
+
+        case 15:
+            comando_15();
+            break;
+
+        case 16:
+            comando_16();
+            break;
+
+        case 17:
+            comando_17();
+            break;
+
+        case 18:
+            comando_18();
+            break;
+
+        case 19:
+            comando_19();
+            break;
     }
 
     return 0;

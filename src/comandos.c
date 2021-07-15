@@ -620,3 +620,302 @@ void comando_14()
     free(BTreeHeader);
     binarioNaTela(BTreeFilename);
 }
+
+
+void comando_15()
+{
+    /**
+     *   Permite a recuperação dos registros de dados em veiculo.bin, 
+     *   juntando-os de forma apropriada com os dados de linha.bin.
+     *   Usa loops aninhados
+     *   Apenas o campo codLinha pode ser utilizado
+     */
+    // Recebe as entradas do comando
+    char veiculoFilename[128], linhaFilename[128];
+    scanf("%s %s codLinha codLinha", veiculoFilename, linhaFilename);
+
+    // Abre os arquivos binarios para leitura
+    FILE *veiculoBin = fopen(veiculoFilename, "r");
+    alloc_check(veiculoBin, "Falha no processamento do arquivo.\n");
+    FILE *linhaBin = fopen(linhaFilename, "r");
+    alloc_check(linhaBin, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho dos arquivos binarios
+    veiculo_header *veiculoHeader = read_binary_veiculo_header(veiculoBin);
+    linha_header *linhaHeader = read_binary_linha_header(linhaBin);
+
+    int totalVeiculo = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;
+    int totalLinha = linhaHeader->nroRegistros + linhaHeader->nroRegRemovidos;
+    int existeRegistro = 0, flag = 0;
+
+    // Para cada registro em 'veiculo'
+    for(int i = 0; i < totalVeiculo; i++){
+        veiculo_data *veiculoData = read_binary_veiculo_data(veiculoBin);
+        // Pula o registro veiculo se estiver removido
+        if(veiculoData->removido == '0'){
+            fseek(veiculoBin, veiculoData->tamanhoRegistro, SEEK_CUR);
+        } 
+        else {
+            flag = 0;
+            // Posiciona o ponteiro do arquivo linha no inicio
+            fseek(linhaBin, LINHA_HEADER_SIZE, SEEK_SET);
+            // Para cada registro em 'linha'
+            for(int j = 0; j < totalLinha && flag == 0; j++){
+                linha_data *linhaData = read_binary_linha_data(linhaBin);
+                // Pula o registro linha se estiver removido
+                if(linhaData->removido == '0'){
+                    fseek(linhaBin, linhaData->tamanhoRegistro, SEEK_CUR);
+                } 
+                else if (veiculoData->codLinha == linhaData->codLinha){
+                    print_veiculo_data(veiculoHeader, veiculoData);
+                    print_linha_data(linhaHeader, linhaData);
+                    printf("\n");
+                    flag = 1; existeRegistro = 1;
+                }
+                free(linhaData);
+            }
+        }
+        free(veiculoData);
+    }
+
+    if(existeRegistro == 0)
+        printf("Registro inexistente.\n");
+
+    free(veiculoHeader);
+    free(linhaHeader);
+    fclose(veiculoBin);
+    fclose(linhaBin);
+}
+
+
+void comando_16()
+{
+    /**
+     *   Permite a recuperação dos registros de dados em veiculo.bin, 
+     *   juntando-os de forma apropriada com os dados de linha.bin.
+     *   Usa um loop unico com a busca da arvore B
+     *   Apenas o campo codLinha pode ser utilizado
+     */
+    // Recebe as entradas do comando
+    char veiculoFilename[128], linhaFilename[128], indexFilename[128];
+    scanf("%s %s codLinha codLinha %s", veiculoFilename, linhaFilename, indexFilename);
+
+    // Abre os arquivos binarios para leitura
+    FILE *veiculoBin = fopen(veiculoFilename, "r");
+    alloc_check(veiculoBin, "Falha no processamento do arquivo.\n");
+    FILE *linhaBin = fopen(linhaFilename, "r");
+    alloc_check(linhaBin, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(indexFilename, "r");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho dos arquivos binarios
+    veiculo_header *veiculoHeader = read_binary_veiculo_header(veiculoBin);
+    linha_header *linhaHeader = read_binary_linha_header(linhaBin);
+    BTree_header *bTreeHeader = read_btree_header(bTreeFile);
+
+    int totalVeiculo = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;
+    int existeRegistro = 0, res;
+    long long int ref;
+
+    // Para cada registro em 'veiculo'
+    for(int i = 0; i < totalVeiculo; i++){
+        veiculo_data *veiculoData = read_binary_veiculo_data(veiculoBin);
+        // Pula o registro veiculo se estiver removido
+        if(veiculoData->removido == '0'){
+            fseek(veiculoBin, veiculoData->tamanhoRegistro, SEEK_CUR);
+        } 
+        else {
+            // Faz a busca usando o arquivo de indice
+            res = search(bTreeHeader->noRaiz, veiculoData->codLinha, bTreeFile, &ref);
+            if(res == FOUND){
+                // Le o registro da posicao encontrada
+                fseek(linhaBin, ref, SEEK_SET);
+                linha_data *linhaData = read_binary_linha_data(linhaBin);
+                // Imprime os registros
+                print_veiculo_data(veiculoHeader, veiculoData);
+                print_linha_data(linhaHeader, linhaData);
+                printf("\n");
+                existeRegistro = 1;
+                free(linhaData);
+            }
+                
+        }
+        free(veiculoData);
+    }
+
+    if(existeRegistro == 0)
+        printf("Registro inexistente.\n");
+
+    free(bTreeHeader);
+    free(veiculoHeader);
+    free(linhaHeader);
+    fclose(veiculoBin);
+    fclose(linhaBin);
+    fclose(bTreeFile);
+}
+
+
+// Funcao de comparacao usada no qsort
+int cmpVeiculo(const void *a, const void *b){
+
+    veiculo_data *r = * (veiculo_data **) a;
+    veiculo_data *s = * (veiculo_data **) b;
+
+    if(r->codLinha > s->codLinha)
+        return 1;
+    else if(r->codLinha < s->codLinha)
+        return -1;
+    else
+        return 0;
+}
+
+void comando_17()
+{
+    /**
+     *  Cria um novo arquivo a partir do arquivo de dados veiculo de
+     *  maneira ordenada
+     */
+    // Recebe as entradas do comando
+    char unorderedFilename[128], orderedFilename[128];
+    scanf("%s %s codLinha", unorderedFilename, orderedFilename);
+
+    // Abre o arquivo nao ordenado para leitura
+    FILE *unorderedFile = fopen(unorderedFilename, "r");
+    alloc_check(unorderedFile, "Falha no processamento do arquivo.\n");
+    // Abre um novo arquivo para escrita
+    FILE *orderedFile = fopen(orderedFilename, "w");
+    alloc_check(orderedFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho
+    veiculo_header *newHeader = read_binary_veiculo_header(unorderedFile);
+    newHeader->status = '0';
+    newHeader->byteProxReg = VEICULO_HEADER_SIZE;
+
+    // Escreve o cabecalho no novo arquivo com status 'inconsistente'
+    update_binary_veiculo_header(newHeader, orderedFile);
+
+    int total = newHeader->nroRegistros + newHeader->nroRegRemovidos;
+    int numRegistros = 0;
+    veiculo_data **data = NULL;
+
+    // Carrega todos os registros nao removidos na RAM
+    for(int i = 0; i < total; i++){
+        veiculo_data *currData = read_binary_veiculo_data(unorderedFile);
+        if(currData->removido == '1'){
+            data = realloc(data, (numRegistros+1)*sizeof(veiculo_data *));
+            data[numRegistros] = currData;
+            numRegistros++;
+        } else {
+            fseek(unorderedFile, currData->tamanhoRegistro, SEEK_CUR);
+            free(currData);
+        }
+    }
+
+    // Ordena os registros
+    qsort(data, numRegistros, sizeof(veiculo_data *), cmpVeiculo);
+
+    // Escreve os registros ordenados no novo arquivo
+    for(int i = 0; i < numRegistros; i++)
+        append_binary_veiculo_data(newHeader, data[i], orderedFile);
+
+    // Atualiza valores do header
+    newHeader->nroRegistros = numRegistros;
+    newHeader->nroRegRemovidos = 0;
+    newHeader->status = '1';
+    update_binary_veiculo_header(newHeader, orderedFile);
+
+    //Libera memoria
+    for(int i = 0; i < numRegistros; i++)
+        free(data[i]);
+    free(data);
+    free(newHeader);
+    fclose(unorderedFile);
+    fclose(orderedFile);
+    binarioNaTela(orderedFilename);
+}
+
+
+// Funcao de comparacao usada no qsort
+int cmpLinha(const void *a, const void *b){
+
+    linha_data *r = * (linha_data **) a;
+    linha_data *s = * (linha_data **) b;
+
+    if(r->codLinha > s->codLinha)
+        return 1;
+    else if(r->codLinha < s->codLinha)
+        return -1;
+    else
+        return 0;
+}
+
+void comando_18()
+{
+    /**
+     *  Cria um novo arquivo a partir do arquivo de dados linha de
+     *  maneira ordenada
+     */
+    // Recebe as entradas do comando
+    char unorderedFilename[128], orderedFilename[128];
+    scanf("%s %s codLinha", unorderedFilename, orderedFilename);
+
+    // Abre o arquivo nao ordenado para leitura
+    FILE *unorderedFile = fopen(unorderedFilename, "r");
+    alloc_check(unorderedFile, "Falha no processamento do arquivo.\n");
+    // Abre um novo arquivo para escrita
+    FILE *orderedFile = fopen(orderedFilename, "w");
+    alloc_check(orderedFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho
+    linha_header *newHeader = read_binary_linha_header(unorderedFile);
+    newHeader->status = '0';
+    newHeader->byteProxReg = LINHA_HEADER_SIZE;
+
+    // Escreve o cabecalho no novo arquivo com status 'inconsistente'
+    update_binary_linha_header(newHeader, orderedFile);
+
+    int total = newHeader->nroRegistros + newHeader->nroRegRemovidos;
+    int numRegistros = 0;
+    linha_data **data = NULL;
+
+    // Carrega todos os registros nao removidos na RAM
+    for(int i = 0; i < total; i++){
+        linha_data *currData = read_binary_linha_data(unorderedFile);
+        if(currData->removido == '1'){
+            data = realloc(data, (numRegistros+1)*sizeof(linha_data *));
+            data[numRegistros] = currData;
+            numRegistros++;
+        } else {
+            fseek(unorderedFile, currData->tamanhoRegistro, SEEK_CUR);
+            free(currData);
+        }
+    }
+
+    // Ordena os registros
+    qsort(data, numRegistros, sizeof(linha_data *), cmpLinha);
+
+    // Escreve os registros ordenados no novo arquivo
+    for(int i = 0; i < numRegistros; i++)
+        append_binary_linha_data(newHeader, data[i], orderedFile);
+
+    // Atualiza valores do header
+    newHeader->nroRegistros = numRegistros;
+    newHeader->nroRegRemovidos = 0;
+    newHeader->status = '1';
+    update_binary_linha_header(newHeader, orderedFile);
+
+    //Libera memoria
+    for(int i = 0; i < numRegistros; i++)
+        free(data[i]);
+    free(data);
+    free(newHeader);
+    fclose(unorderedFile);
+    fclose(orderedFile);
+    binarioNaTela(orderedFilename);
+}
+
+
+void comando_19()
+{
+
+}
