@@ -812,7 +812,6 @@ void comando_19()
      *   Utiliza o campo codLinha de ambos arquivos veiculo.bin e linha.bin
      *      para relacionar os arquivos.
      */
-    // Recebe as entradas do comando
     char veiculoFilename[128], linhaFilename[128];
     FILE *unorderedVeiculoFile,     /* Pointer para o arquivo desordenado de veiculo */
          *orderedVeiculoFile,       /* Pointer para o arquivo ordenado de veiculo */
@@ -826,9 +825,10 @@ void comando_19()
         linhaCounter;               /* Contador do registro de linha iterado */
     int registerFound;              /* boolean: Flag pra registro encontrado */
 
-    scanf("%s %s codLinha codLinha", veiculoFilename, linhaFilename);
-    
-    /* Abrir arquivos */
+    scanf("%s %s codLinha codLinha", veiculoFilename, linhaFilename);   /* Recebe entradas  */
+                                                                        /*  do comando.     */
+
+    /* Abre arquivos de veiculo e linha. E cria seus respectivos arquivos para serem ordenados */
     unorderedVeiculoFile = fopen(veiculoFilename, "r");
     orderedVeiculoFile = fopen(ORDERED_VEICULO_FILENAME, "w+");
 
@@ -840,30 +840,52 @@ void comando_19()
 
     generate_ordered_linha_file(unorderedLinhaFile, orderedLinhaFile);
     
+    /* Armazena os headers dos arquivos ordenados */
     veiculoHeader = read_binary_veiculo_header(orderedVeiculoFile);
     linhaHeader = read_binary_linha_header(orderedLinhaFile);
     
+    /* Le o primeiro arquivo de veiculo */
     veiculoCounter = 0;
     veiculoData = read_binary_veiculo_data(orderedVeiculoFile);
 
+    /* Lê o primeiro arquivo de linha */
     linhaCounter = 0;
     linhaData = read_binary_linha_data(orderedLinhaFile);
     
+    /* Atribui a flag para registros encontrados */
     registerFound = 0;
 
+    /**
+     * Loop principal do código:
+     *  Enquanto há registros nos dois arquivos (O counter para os dois arquivos não atingiu o numero
+     *                                             máximo de registros)
+     *  Checa o codLinha dos dois tipos de registro (linha e veiculo)
+     *      Se for o mesmo codLinha, então deve imprimir o merge e incrementar os contadores do arquivo
+     *          de veiculo e do arquivo de linha (Já que é possível que exista mais arquivos de veiculo
+     *          com o mesmo codLinha)
+     *      Se o codLinha do registro de veiculo for menor, então devemos incrementar o contador
+     *          somente do arquivo de veiculo, já que já passamos por esse codLinha no contador do
+     *          arquivo de linha
+     *      Se o codLinha do registro de linha for menor, então devemos incrementaro contador somente
+     *          do arquivo de linha, já que ja passamos por esse codLinha no contador do arquivo de
+     *          veiculo.
+     *  
+     *  Vale notar que ambos os arquivos com registros ja foram ordenados, por isso conseguimos fazer
+     *      esse algoritmo de match mais eficientemente. 
+    */
     while (veiculoCounter < veiculoHeader->nroRegistros && linhaCounter < linhaHeader->nroRegistros)
     {
-        if (veiculoData->codLinha < linhaData->codLinha) {
-            veiculoCounter++;
+        if (veiculoData->codLinha < linhaData->codLinha) {  /* Cenário que o contador do arquivo de */
+            veiculoCounter++;                               /*  veiculo deve ser incrementado       */
             free(veiculoData);
             veiculoData = read_binary_veiculo_data(orderedVeiculoFile);
-        } else if (veiculoData->codLinha > linhaData->codLinha) {
-            free(linhaData);
+        } else if (veiculoData->codLinha > linhaData->codLinha) {   /* Cenário que o contador do arquivo    */
+            free(linhaData);                                        /*  de linha deve ser incrementado      */
             linhaCounter++;
             linhaData = read_binary_linha_data(orderedLinhaFile);
-        } else {
-            registerFound = 1;
-
+        } else {                                            /* Cenário de impressão. Somente o arquivo de   */
+            registerFound = 1;                              /*  veiculo deve ser incrementado para procurar */
+                                                            /*  por mais veiculos com o mesmo codLinha      */
             print_veiculo_data(veiculoHeader, veiculoData);
             print_linha_data(linhaHeader, linhaData);
             printf("\n");
@@ -874,10 +896,11 @@ void comando_19()
         }
     }
 
-    if (registerFound == NOT_FOUND) {
-        printf("Registro inexistente.\n");
-    }
+    if (registerFound == NOT_FOUND) {       /* Caso a flag de impressão não tenha sido  */
+        printf("Registro inexistente.\n");  /*  atribuida durante a execução do         */
+    }                                       /*  algoritmo, então não existe registro    */
     
+    /* Liberação da memória */
     free(veiculoHeader);
     free(veiculoData);
     free(linhaHeader);
