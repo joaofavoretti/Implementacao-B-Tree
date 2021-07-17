@@ -2,7 +2,25 @@
  * Trabalho Prático 3 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
- */
+///////////////////////////////////////////////////
+ *
+ * util.c
+ *  
+ *  Contem todas as funções utilitarias para a execução
+ *      do programa.
+ * 
+ *  alloc_check() -- Checar se a alocacao de ponteiros foi feita corretamente
+ *  is_null_field() -- Checa se o campo lido corresponde à string "NULO"
+ *  cmp_veiculo() -- Funcao para a ordenacao de registros do tipo veiculo
+ *  cmp_linha() -- Funcao para a ordenacao de registros do tipo linha
+ *  generate_ordered_veiculo_file() -- Funcao para gerar um arquivo com os  
+ *                                      registros do tipo veiculo ordenados
+ *  generate_ordered_linha_file() -- Funcao para gerar um arquivo com os 
+ *                                      registros do tipo linha ordenados
+ *  binarioNaTela() -- Funcão fornecida: Passa os bytes de um arquivo para um numero double
+ *  scan_quote_string() -- Funcão fornecida: Le uma entrada no formato "entrada"
+ *  convertePrefixo() -- Funcao fornecida: Passa o campo prefixo STRING para um campo inteiro
+*/
 
 #include <util.h>
 
@@ -12,16 +30,17 @@ void alloc_check(void *data_pointer, char *message)
      * Funcao geral para checar se pointeiro foi alocado
      * Caso não, o programa é encerrado com o código ALLOC_NULL_POINTER
     */
-    if(data_pointer == NULL) {
+    if (data_pointer == NULL)
+    {
 
-        if (message != NULL) {
+        if (message != NULL)
+        {
             printf("%s", message);
         }
 
         exit(ALLOC_NULL_POINTER);
     }
 }
-
 
 int is_null_field(char *field)
 {
@@ -30,7 +49,8 @@ int is_null_field(char *field)
      * @return 1 se o campo tem o valor "NULO"
      * @return 0 se o campo possue um valor diferente de "NULO"
     */
-    if (!strncmp(field, "NULO", 4)) {
+    if (!strncmp(field, "NULO", 4))
+    {
         return 1;
     }
     return 0;
@@ -40,12 +60,12 @@ int is_null_field(char *field)
 int cmp_veiculo(const void *a, const void *b)
 {
 
-    veiculo_data *r = * (veiculo_data **) a;
-    veiculo_data *s = * (veiculo_data **) b;
+    veiculo_data *r = *(veiculo_data **)a;
+    veiculo_data *s = *(veiculo_data **)b;
 
-    if(r->codLinha > s->codLinha)
+    if (r->codLinha > s->codLinha)
         return 1;
-    else if(r->codLinha < s->codLinha)
+    else if (r->codLinha < s->codLinha)
         return -1;
     else
         return 0;
@@ -55,18 +75,32 @@ int cmp_veiculo(const void *a, const void *b)
 int cmp_linha(const void *a, const void *b)
 {
 
-    linha_data *r = * (linha_data **) a;
-    linha_data *s = * (linha_data **) b;
+    linha_data *r = *(linha_data **)a;
+    linha_data *s = *(linha_data **)b;
 
-    if(r->codLinha > s->codLinha)
+    if (r->codLinha > s->codLinha)
         return 1;
-    else if(r->codLinha < s->codLinha)
+    else if (r->codLinha < s->codLinha)
         return -1;
     else
         return 0;
 }
 
-void generate_ordered_veiculo_file (FILE *unorderedFile, FILE *orderedFile)
+/** generate_ordered_linha_file()
+ * 
+ *  Procedimento para gerar escrever os registros de veiculo do
+ *      unorderedFile dentro do arquivo orderedFile.
+ *  A função cuida da escrita dos arquivos de cabecalho, assim como
+ *      os registros de dados.
+ *  Além de inserir os registros de dados de modo ordenado baseado
+ *      no campo codLinha, ele também não escreve os arquivos removidos
+ *      logicamente.
+ * 
+ *  Argumentos:
+ *      unorderedFile -- FILE para o arquivo desordenado aberto para leitura
+ *      orderedFile -- FILE para o arquivo desornado criado e sem conteudo.
+ */
+void generate_ordered_veiculo_file(FILE *unorderedFile, FILE *orderedFile)
 {
     // Le cabecalho
     veiculo_header *orderedHeader = read_binary_veiculo_header(unorderedFile);
@@ -82,13 +116,17 @@ void generate_ordered_veiculo_file (FILE *unorderedFile, FILE *orderedFile)
     veiculo_data **data = NULL;
 
     // Carrega todos os registros nao removidos na RAM
-    for(int i = 0; i < total; i++){
+    for (int i = 0; i < total; i++)
+    {
         veiculo_data *currData = read_binary_veiculo_data(unorderedFile);
-        if(currData->removido == '1'){
-            data = realloc(data, (numRegistros+1)*sizeof(veiculo_data *));
+        if (currData->removido == '1')
+        {
+            data = realloc(data, (numRegistros + 1) * sizeof(veiculo_data *));
             data[numRegistros] = currData;
             numRegistros++;
-        } else {
+        }
+        else
+        {
             fseek(unorderedFile, currData->tamanhoRegistro, SEEK_CUR);
             free(currData);
         }
@@ -98,7 +136,7 @@ void generate_ordered_veiculo_file (FILE *unorderedFile, FILE *orderedFile)
     qsort(data, numRegistros, sizeof(veiculo_data *), cmp_veiculo);
 
     // Escreve os registros ordenados no novo arquivo
-    for(int i = 0; i < numRegistros; i++)
+    for (int i = 0; i < numRegistros; i++)
         append_binary_veiculo_data(orderedHeader, data[i], orderedFile);
 
     // Atualiza valores do header
@@ -108,13 +146,27 @@ void generate_ordered_veiculo_file (FILE *unorderedFile, FILE *orderedFile)
     update_binary_veiculo_header(orderedHeader, orderedFile);
 
     //Libera memoria
-    for(int i = 0; i < numRegistros; i++)
+    for (int i = 0; i < numRegistros; i++)
         free(data[i]);
     free(data);
     free(orderedHeader);
 }
 
-void generate_ordered_linha_file (FILE *unorderedFile, FILE *orderedFile)
+/** generate_ordered_linha_file()
+ * 
+ *  Procedimento para gerar escrever os registros de linha do
+ *      unorderedFile dentro do arquivo orderedFile.
+ *  A função cuida da escrita dos arquivos de cabecalho, assim como
+ *      os registros de dados.
+ *  Além de inserir os registros de dados de modo ordenado baseado
+ *      no campo codLinha, ele também não escreve os arquivos removidos
+ *      logicamente.
+ * 
+ *  Argumentos:
+ *      unorderedFile -- FILE para o arquivo desordenado aberto para leitura
+ *      orderedFile -- FILE para o arquivo desornado criado e sem conteudo.
+ */
+void generate_ordered_linha_file(FILE *unorderedFile, FILE *orderedFile)
 {
     // Le cabecalho
     linha_header *orderedHeader = read_binary_linha_header(unorderedFile);
@@ -129,13 +181,17 @@ void generate_ordered_linha_file (FILE *unorderedFile, FILE *orderedFile)
     linha_data **data = NULL;
 
     // Carrega todos os registros nao removidos na RAM
-    for(int i = 0; i < total; i++){
+    for (int i = 0; i < total; i++)
+    {
         linha_data *currData = read_binary_linha_data(unorderedFile);
-        if(currData->removido == '1'){
-            data = realloc(data, (numRegistros+1)*sizeof(linha_data *));
+        if (currData->removido == '1')
+        {
+            data = realloc(data, (numRegistros + 1) * sizeof(linha_data *));
             data[numRegistros] = currData;
             numRegistros++;
-        } else {
+        }
+        else
+        {
             fseek(unorderedFile, currData->tamanhoRegistro, SEEK_CUR);
             free(currData);
         }
@@ -145,7 +201,7 @@ void generate_ordered_linha_file (FILE *unorderedFile, FILE *orderedFile)
     qsort(data, numRegistros, sizeof(linha_data *), cmp_linha);
 
     // Escreve os registros ordenados no novo arquivo
-    for(int i = 0; i < numRegistros; i++)
+    for (int i = 0; i < numRegistros; i++)
         append_binary_linha_data(orderedHeader, data[i], orderedFile);
 
     // Atualiza valores do header
@@ -155,45 +211,48 @@ void generate_ordered_linha_file (FILE *unorderedFile, FILE *orderedFile)
     update_binary_linha_header(orderedHeader, orderedFile);
 
     //Libera memoria
-    for(int i = 0; i < numRegistros; i++)
+    for (int i = 0; i < numRegistros; i++)
         free(data[i]);
 
     free(data);
     free(orderedHeader);
 }
 
-void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
+void binarioNaTela(char *nomeArquivoBinario)
+{ /* Você não precisa entender o código dessa função. */
 
-	/* Use essa função para comparação no run.codes. Lembre-se de ter fechado (fclose) o arquivo anteriormente.
+    /* Use essa função para comparação no run.codes. Lembre-se de ter fechado (fclose) o arquivo anteriormente.
 	*  Ela vai abrir de novo para leitura e depois fechar (você não vai perder pontos por isso se usar ela). */
 
-	unsigned long i, cs;
-	unsigned char *mb;
-	size_t fl;
-	FILE *fs;
-	if(nomeArquivoBinario == NULL || !(fs = fopen(nomeArquivoBinario, "rb"))) {
-		fprintf(stderr, "ERRO AO ESCREVER O BINARIO NA TELA (função binarioNaTela): não foi possível abrir o arquivo que me passou para leitura. Ele existe e você tá passando o nome certo? Você lembrou de fechar ele com fclose depois de usar?\n");
-		return;
-	}
-	fseek(fs, 0, SEEK_END);
-	fl = ftell(fs);
-	fseek(fs, 0, SEEK_SET);
-	mb = (unsigned char *) malloc(fl);
-	fread(mb, 1, fl, fs);
+    unsigned long i, cs;
+    unsigned char *mb;
+    size_t fl;
+    FILE *fs;
+    if (nomeArquivoBinario == NULL || !(fs = fopen(nomeArquivoBinario, "rb")))
+    {
+        fprintf(stderr, "ERRO AO ESCREVER O BINARIO NA TELA (função binarioNaTela): não foi possível abrir o arquivo que me passou para leitura. Ele existe e você tá passando o nome certo? Você lembrou de fechar ele com fclose depois de usar?\n");
+        return;
+    }
+    fseek(fs, 0, SEEK_END);
+    fl = ftell(fs);
+    fseek(fs, 0, SEEK_SET);
+    mb = (unsigned char *)malloc(fl);
+    fread(mb, 1, fl, fs);
 
-	cs = 0;
-	for(i = 0; i < fl; i++) {
-		cs += (unsigned long) mb[i];
-	}
-	printf("%lf\n", (cs / (double) 100));
-	free(mb);
-	fclose(fs);
+    cs = 0;
+    for (i = 0; i < fl; i++)
+    {
+        cs += (unsigned long)mb[i];
+    }
+    printf("%lf\n", (cs / (double)100));
+    free(mb);
+    fclose(fs);
 }
 
+void scan_quote_string(char *str)
+{
 
-void scan_quote_string(char *str) {
-
-	/*
+    /*
 	*	Use essa função para ler um campo string delimitado entre aspas (").
 	*	Chame ela na hora que for ler tal campo. Por exemplo:
 	*
@@ -206,31 +265,42 @@ void scan_quote_string(char *str) {
 	*
 	*/
 
-	char R;
+    char R;
 
-	while((R = getchar()) != EOF && isspace(R)); // ignorar espaços, \r, \n...
+    while ((R = getchar()) != EOF && isspace(R))
+        ; // ignorar espaços, \r, \n...
 
-	if(R == 'N' || R == 'n') { // campo NULO
-		getchar(); getchar(); getchar(); // ignorar o "ULO" de NULO.
-		strcpy(str, ""); // copia string vazia
-	} else if(R == '\"') {
-		if(scanf("%[^\"]", str) != 1) { // ler até o fechamento das aspas
-			strcpy(str, "");
-		}
-		getchar(); // ignorar aspas fechando
-	} else if(R != EOF){ // vc tá tentando ler uma string que não tá entre aspas! Fazer leitura normal %s então, pois deve ser algum inteiro ou algo assim...
-		str[0] = R;
-		scanf("%s", &str[1]);
-	} else { // EOF
-		strcpy(str, "");
-	}
+    if (R == 'N' || R == 'n')
+    { // campo NULO
+        getchar();
+        getchar();
+        getchar();       // ignorar o "ULO" de NULO.
+        strcpy(str, ""); // copia string vazia
+    }
+    else if (R == '\"')
+    {
+        if (scanf("%[^\"]", str) != 1)
+        { // ler até o fechamento das aspas
+            strcpy(str, "");
+        }
+        getchar(); // ignorar aspas fechando
+    }
+    else if (R != EOF)
+    { // vc tá tentando ler uma string que não tá entre aspas! Fazer leitura normal %s então, pois deve ser algum inteiro ou algo assim...
+        str[0] = R;
+        scanf("%s", &str[1]);
+    }
+    else
+    { // EOF
+        strcpy(str, "");
+    }
 }
 
-
-int convertePrefixo(char* str) {
+int convertePrefixo(char *str)
+{
 
     /* O registro que tem essa string como chave foi removido */
-    if(str[0] == '*')
+    if (str[0] == '*')
         return -1;
 
     /* Começamos com o primeiro digito na ordem de 36^0 = 1 */
@@ -238,7 +308,8 @@ int convertePrefixo(char* str) {
 
     /* Faz a conversão char por char para chegar ao resultado */
     int result = 0;
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
 
         /* 
             Interpreta o char atual como se fosse um digito
@@ -249,10 +320,10 @@ int convertePrefixo(char* str) {
         */
         int cur_digit;
         /* Checa pelos digitos normais e os converte para números */
-        if(str[i] >= '0' && str[i] <= '9')
+        if (str[i] >= '0' && str[i] <= '9')
             cur_digit = str[i] - '0';
         /* Checa pelas letras e as converte para números */
-        else if(str[i] >= 'A' && str[i] <= 'Z')
+        else if (str[i] >= 'A' && str[i] <= 'Z')
             cur_digit = 10 + str[i] - 'A';
 
         /*
@@ -268,13 +339,10 @@ int convertePrefixo(char* str) {
 
         /* Aumenta a ordem atual */
         power *= 36;
-
     }
 
     return result;
-
 }
-
 
 /* ---------------- EXTRA ----------------
 
