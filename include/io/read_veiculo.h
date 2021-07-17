@@ -7,7 +7,6 @@
 #ifndef INCLUDE_IO_VEICULO_READ_H
 #define INCLUDE_IO_VEICULO_READ_H
 
-#include <util.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +14,8 @@
 #define FAIL_BINARY_STATUS 0
 #define VEICULO_HEADER_SIZE 175     /* Tamanho do cabecalho do ao arquivo binario veiculo */
                                     /* Usado para calcular o offset do primeiro registro de dados */
+
+#define ORDERED_VEICULO_FILENAME "o_veiculo.bin"
 
 /**
  * Struct para armazenar o cabecalho do arquivo tipo veiculo

@@ -36,6 +36,131 @@ int is_null_field(char *field)
     return 0;
 }
 
+// Funcao de comparacao usada no qsort
+int cmp_veiculo(const void *a, const void *b)
+{
+
+    veiculo_data *r = * (veiculo_data **) a;
+    veiculo_data *s = * (veiculo_data **) b;
+
+    if(r->codLinha > s->codLinha)
+        return 1;
+    else if(r->codLinha < s->codLinha)
+        return -1;
+    else
+        return 0;
+}
+
+// Funcao de comparacao usada no qsort
+int cmp_linha(const void *a, const void *b)
+{
+
+    linha_data *r = * (linha_data **) a;
+    linha_data *s = * (linha_data **) b;
+
+    if(r->codLinha > s->codLinha)
+        return 1;
+    else if(r->codLinha < s->codLinha)
+        return -1;
+    else
+        return 0;
+}
+
+void generate_ordered_veiculo_file (FILE *unorderedFile, FILE *orderedFile)
+{
+    // Le cabecalho
+    veiculo_header *orderedHeader = read_binary_veiculo_header(unorderedFile);
+    orderedHeader->status = '0';
+    orderedHeader->byteProxReg = VEICULO_HEADER_SIZE;
+
+    // Escreve o cabecalho no novo arquivo com status 'inconsistente'
+    update_binary_veiculo_header(orderedHeader, orderedFile);
+
+    int total = orderedHeader->nroRegistros + orderedHeader->nroRegRemovidos;
+    int numRegistros = 0;
+
+    veiculo_data **data = NULL;
+
+    // Carrega todos os registros nao removidos na RAM
+    for(int i = 0; i < total; i++){
+        veiculo_data *currData = read_binary_veiculo_data(unorderedFile);
+        if(currData->removido == '1'){
+            data = realloc(data, (numRegistros+1)*sizeof(veiculo_data *));
+            data[numRegistros] = currData;
+            numRegistros++;
+        } else {
+            fseek(unorderedFile, currData->tamanhoRegistro, SEEK_CUR);
+            free(currData);
+        }
+    }
+
+    // Ordena os registros
+    qsort(data, numRegistros, sizeof(veiculo_data *), cmp_veiculo);
+
+    // Escreve os registros ordenados no novo arquivo
+    for(int i = 0; i < numRegistros; i++)
+        append_binary_veiculo_data(orderedHeader, data[i], orderedFile);
+
+    // Atualiza valores do header
+    orderedHeader->nroRegistros = numRegistros;
+    orderedHeader->nroRegRemovidos = 0;
+    orderedHeader->status = '1';
+    update_binary_veiculo_header(orderedHeader, orderedFile);
+
+    //Libera memoria
+    for(int i = 0; i < numRegistros; i++)
+        free(data[i]);
+    free(data);
+    free(orderedHeader);
+}
+
+void generate_ordered_linha_file (FILE *unorderedFile, FILE *orderedFile)
+{
+    // Le cabecalho
+    linha_header *orderedHeader = read_binary_linha_header(unorderedFile);
+    orderedHeader->status = '0';
+    orderedHeader->byteProxReg = LINHA_HEADER_SIZE;
+
+    // Escreve o cabecalho no novo arquivo com status 'inconsistente'
+    update_binary_linha_header(orderedHeader, orderedFile);
+
+    int total = orderedHeader->nroRegistros + orderedHeader->nroRegRemovidos;
+    int numRegistros = 0;
+    linha_data **data = NULL;
+
+    // Carrega todos os registros nao removidos na RAM
+    for(int i = 0; i < total; i++){
+        linha_data *currData = read_binary_linha_data(unorderedFile);
+        if(currData->removido == '1'){
+            data = realloc(data, (numRegistros+1)*sizeof(linha_data *));
+            data[numRegistros] = currData;
+            numRegistros++;
+        } else {
+            fseek(unorderedFile, currData->tamanhoRegistro, SEEK_CUR);
+            free(currData);
+        }
+    }
+
+    // Ordena os registros
+    qsort(data, numRegistros, sizeof(linha_data *), cmp_linha);
+
+    // Escreve os registros ordenados no novo arquivo
+    for(int i = 0; i < numRegistros; i++)
+        append_binary_linha_data(orderedHeader, data[i], orderedFile);
+
+    // Atualiza valores do header
+    orderedHeader->nroRegistros = numRegistros;
+    orderedHeader->nroRegRemovidos = 0;
+    orderedHeader->status = '1';
+    update_binary_linha_header(orderedHeader, orderedFile);
+
+    //Libera memoria
+    for(int i = 0; i < numRegistros; i++)
+        free(data[i]);
+
+    free(data);
+    free(orderedHeader);
+}
 
 void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
 
