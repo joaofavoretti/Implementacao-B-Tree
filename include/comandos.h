@@ -1,5 +1,5 @@
 /**
- * Trabalho Prático 2 - Organizacao de Arquivos
+ * Trabalho Prático 3 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
  */
@@ -33,5 +33,11 @@ void comando_11();
 void comando_12();
 void comando_13();
 void comando_14();
+
+void comando_15();
+void comando_16();
+void comando_17();
+void comando_18();
+void comando_19();
 
 #endif

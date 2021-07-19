@@ -1,5 +1,5 @@
 /**
- * Trabalho Prático 2 - Organizacao de Arquivos
+ * Trabalho Prático 3 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
  */
@@ -7,10 +7,6 @@
 #include <io/read_veiculo.h>
 #include <io/write_veiculo.h>
 #include <util.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 veiculo_header *read_csv_veiculo_header(FILE *csvFilePointer)
 {

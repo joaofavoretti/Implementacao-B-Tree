@@ -1,5 +1,5 @@
 /**
- * Trabalho Prático 2 - Organizacao de Arquivos
+ * Trabalho Prático 3 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
  */
@@ -619,4 +619,294 @@ void comando_14()
     free(dataHeader);
     free(BTreeHeader);
     binarioNaTela(BTreeFilename);
+}
+
+
+void comando_15()
+{
+    /**
+     *   Permite a recuperação dos registros de dados em veiculo.bin, 
+     *   juntando-os de forma apropriada com os dados de linha.bin.
+     *   Usa loops aninhados
+     *   Apenas o campo codLinha pode ser utilizado
+     */
+    // Recebe as entradas do comando
+    char veiculoFilename[128], linhaFilename[128];
+    scanf("%s %s codLinha codLinha", veiculoFilename, linhaFilename);
+
+    // Abre os arquivos binarios para leitura
+    FILE *veiculoBin = fopen(veiculoFilename, "r");
+    alloc_check(veiculoBin, "Falha no processamento do arquivo.\n");
+    FILE *linhaBin = fopen(linhaFilename, "r");
+    alloc_check(linhaBin, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho dos arquivos binarios
+    veiculo_header *veiculoHeader = read_binary_veiculo_header(veiculoBin);
+    linha_header *linhaHeader = read_binary_linha_header(linhaBin);
+
+    int totalVeiculo = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;
+    int totalLinha = linhaHeader->nroRegistros + linhaHeader->nroRegRemovidos;
+    int existeRegistro = 0, flag = 0;
+
+    // Para cada registro em 'veiculo'
+    for(int i = 0; i < totalVeiculo; i++){
+        veiculo_data *veiculoData = read_binary_veiculo_data(veiculoBin);
+        // Pula o registro veiculo se estiver removido
+        if(veiculoData->removido == '0'){
+            fseek(veiculoBin, veiculoData->tamanhoRegistro, SEEK_CUR);
+        } 
+        else {
+            flag = 0;
+            // Posiciona o ponteiro do arquivo linha no inicio
+            fseek(linhaBin, LINHA_HEADER_SIZE, SEEK_SET);
+            // Para cada registro em 'linha'
+            for(int j = 0; j < totalLinha && flag == 0; j++){
+                linha_data *linhaData = read_binary_linha_data(linhaBin);
+                // Pula o registro linha se estiver removido
+                if(linhaData->removido == '0'){
+                    fseek(linhaBin, linhaData->tamanhoRegistro, SEEK_CUR);
+                } 
+                else if (veiculoData->codLinha == linhaData->codLinha){
+                    print_veiculo_data(veiculoHeader, veiculoData);
+                    print_linha_data(linhaHeader, linhaData);
+                    printf("\n");
+                    flag = 1; existeRegistro = 1;
+                }
+                free(linhaData);
+            }
+        }
+        free(veiculoData);
+    }
+
+    if(existeRegistro == 0)
+        printf("Registro inexistente.\n");
+
+    free(veiculoHeader);
+    free(linhaHeader);
+    fclose(veiculoBin);
+    fclose(linhaBin);
+}
+
+
+void comando_16()
+{
+    /**
+     *   Permite a recuperação dos registros de dados em veiculo.bin, 
+     *   juntando-os de forma apropriada com os dados de linha.bin.
+     *   Usa um loop unico com a busca da arvore B
+     *   Apenas o campo codLinha pode ser utilizado
+     */
+    // Recebe as entradas do comando
+    char veiculoFilename[128], linhaFilename[128], indexFilename[128];
+    scanf("%s %s codLinha codLinha %s", veiculoFilename, linhaFilename, indexFilename);
+
+    // Abre os arquivos binarios para leitura
+    FILE *veiculoBin = fopen(veiculoFilename, "r");
+    alloc_check(veiculoBin, "Falha no processamento do arquivo.\n");
+    FILE *linhaBin = fopen(linhaFilename, "r");
+    alloc_check(linhaBin, "Falha no processamento do arquivo.\n");
+    FILE *bTreeFile = fopen(indexFilename, "r");
+    alloc_check(bTreeFile, "Falha no processamento do arquivo.\n");
+
+    // Le cabecalho dos arquivos binarios
+    veiculo_header *veiculoHeader = read_binary_veiculo_header(veiculoBin);
+    linha_header *linhaHeader = read_binary_linha_header(linhaBin);
+    BTree_header *bTreeHeader = read_btree_header(bTreeFile);
+
+    int totalVeiculo = veiculoHeader->nroRegistros + veiculoHeader->nroRegRemovidos;
+    int existeRegistro = 0, res;
+    long long int ref;
+
+    // Para cada registro em 'veiculo'
+    for(int i = 0; i < totalVeiculo; i++){
+        veiculo_data *veiculoData = read_binary_veiculo_data(veiculoBin);
+        // Pula o registro veiculo se estiver removido
+        if(veiculoData->removido == '0'){
+            fseek(veiculoBin, veiculoData->tamanhoRegistro, SEEK_CUR);
+        } 
+        else {
+            // Faz a busca usando o arquivo de indice
+            res = search(bTreeHeader->noRaiz, veiculoData->codLinha, bTreeFile, &ref);
+            if(res == FOUND){
+                // Le o registro da posicao encontrada
+                fseek(linhaBin, ref, SEEK_SET);
+                linha_data *linhaData = read_binary_linha_data(linhaBin);
+                // Imprime os registros
+                print_veiculo_data(veiculoHeader, veiculoData);
+                print_linha_data(linhaHeader, linhaData);
+                printf("\n");
+                existeRegistro = 1;
+                free(linhaData);
+            }
+                
+        }
+        free(veiculoData);
+    }
+
+    if(existeRegistro == 0)
+        printf("Registro inexistente.\n");
+
+    free(bTreeHeader);
+    free(veiculoHeader);
+    free(linhaHeader);
+    fclose(veiculoBin);
+    fclose(linhaBin);
+    fclose(bTreeFile);
+}
+
+void comando_17()
+{
+    /**
+     *  Cria um novo arquivo a partir do arquivo de dados veiculo de
+     *  maneira ordenada
+     */
+    // Recebe as entradas do comando
+    char unorderedFilename[128], orderedFilename[128];
+    scanf("%s %s codLinha", unorderedFilename, orderedFilename);
+
+    // Abre o arquivo nao ordenado para leitura
+    FILE *unorderedFile = fopen(unorderedFilename, "r");
+    alloc_check(unorderedFile, "Falha no processamento do arquivo.\n");
+    // Abre um novo arquivo para escrita
+    FILE *orderedFile = fopen(orderedFilename, "w");
+    alloc_check(orderedFile, "Falha no processamento do arquivo.\n");
+
+    generate_ordered_veiculo_file(unorderedFile, orderedFile);
+
+    //Libera memoria
+    fclose(unorderedFile);
+    fclose(orderedFile);
+    binarioNaTela(orderedFilename);
+}
+
+void comando_18()
+{
+    /**
+     *  Cria um novo arquivo a partir do arquivo de dados linha de
+     *  maneira ordenada
+     */
+    // Recebe as entradas do comando
+    char unorderedFilename[128], orderedFilename[128];
+    scanf("%s %s codLinha", unorderedFilename, orderedFilename);
+
+    // Abre o arquivo nao ordenado para leitura
+    FILE *unorderedFile = fopen(unorderedFilename, "r");
+    alloc_check(unorderedFile, "Falha no processamento do arquivo.\n");
+    // Abre um novo arquivo para escrita
+    FILE *orderedFile = fopen(orderedFilename, "w");
+    alloc_check(orderedFile, "Falha no processamento do arquivo.\n");
+
+    generate_ordered_linha_file(unorderedFile, orderedFile);
+    
+    fclose(unorderedFile);
+    fclose(orderedFile);
+    binarioNaTela(orderedFilename);
+}
+
+
+void comando_19()
+{
+    /**
+     *   Permite a recuperação dos registros de dados em veiculo.bin, 
+     *   juntando-os de forma eficiente com os dados de linha.bin.
+     *   Utiliza o campo codLinha de ambos arquivos veiculo.bin e linha.bin
+     *      para relacionar os arquivos.
+     */
+    char veiculoFilename[128], linhaFilename[128];
+    FILE *unorderedVeiculoFile,     /* Pointer para o arquivo desordenado de veiculo */
+         *orderedVeiculoFile,       /* Pointer para o arquivo ordenado de veiculo */
+         *unorderedLinhaFile,       /* Pointer para o arquivo desordenado de linha */
+         *orderedLinhaFile;         /* Pointer para o arquivo ordenado de linha */
+    veiculo_header *veiculoHeader;  /* Header do arquivo veiculo ordenado */
+    linha_header *linhaHeader;      /* Header do arquivo linha ordenado*/
+    veiculo_data *veiculoData;      /* Data struct para o arquivo veiculo */
+    linha_data *linhaData;          /* Data struct para o arquivo linha */
+    int veiculoCounter,             /* Contador do registro de veiculo iterado */
+        linhaCounter;               /* Contador do registro de linha iterado */
+    int registerFound;              /* boolean: Flag pra registro encontrado */
+
+    scanf("%s %s codLinha codLinha", veiculoFilename, linhaFilename);   /* Recebe entradas  */
+                                                                        /*  do comando.     */
+
+    /* Abre arquivos de veiculo e linha. E cria seus respectivos arquivos para serem ordenados */
+    unorderedVeiculoFile = fopen(veiculoFilename, "r");
+    orderedVeiculoFile = fopen(ORDERED_VEICULO_FILENAME, "w+");
+
+    unorderedLinhaFile = fopen(linhaFilename, "r");
+    orderedLinhaFile = fopen(ORDERED_LINHA_FILENAME, "w+");
+   
+    /* Gerar os arquivos ordenados com as funcoes do comando 17 e 18 */
+    generate_ordered_veiculo_file(unorderedVeiculoFile, orderedVeiculoFile);
+
+    generate_ordered_linha_file(unorderedLinhaFile, orderedLinhaFile);
+    
+    /* Armazena os headers dos arquivos ordenados */
+    veiculoHeader = read_binary_veiculo_header(orderedVeiculoFile);
+    linhaHeader = read_binary_linha_header(orderedLinhaFile);
+    
+    /* Le o primeiro arquivo de veiculo */
+    veiculoCounter = 0;
+    veiculoData = read_binary_veiculo_data(orderedVeiculoFile);
+
+    /* Lê o primeiro arquivo de linha */
+    linhaCounter = 0;
+    linhaData = read_binary_linha_data(orderedLinhaFile);
+    
+    /* Atribui a flag para registros encontrados */
+    registerFound = 0;
+
+    /**
+     * Loop principal do código:
+     *  Enquanto há registros nos dois arquivos (O counter para os dois arquivos não atingiu o numero
+     *                                             máximo de registros)
+     *  Checa o codLinha dos dois tipos de registro (linha e veiculo)
+     *      Se for o mesmo codLinha, então deve imprimir o merge e incrementar os contadores do arquivo
+     *          de veiculo e do arquivo de linha (Já que é possível que exista mais arquivos de veiculo
+     *          com o mesmo codLinha)
+     *      Se o codLinha do registro de veiculo for menor, então devemos incrementar o contador
+     *          somente do arquivo de veiculo, já que já passamos por esse codLinha no contador do
+     *          arquivo de linha
+     *      Se o codLinha do registro de linha for menor, então devemos incrementaro contador somente
+     *          do arquivo de linha, já que ja passamos por esse codLinha no contador do arquivo de
+     *          veiculo.
+     *  
+     *  Vale notar que ambos os arquivos com registros ja foram ordenados, por isso conseguimos fazer
+     *      esse algoritmo de match mais eficientemente. 
+    */
+    while (veiculoCounter < veiculoHeader->nroRegistros && linhaCounter < linhaHeader->nroRegistros)
+    {
+        if (veiculoData->codLinha < linhaData->codLinha) {  /* Cenário que o contador do arquivo de */
+            veiculoCounter++;                               /*  veiculo deve ser incrementado       */
+            free(veiculoData);
+            veiculoData = read_binary_veiculo_data(orderedVeiculoFile);
+        } else if (veiculoData->codLinha > linhaData->codLinha) {   /* Cenário que o contador do arquivo    */
+            free(linhaData);                                        /*  de linha deve ser incrementado      */
+            linhaCounter++;
+            linhaData = read_binary_linha_data(orderedLinhaFile);
+        } else {                                            /* Cenário de impressão. Somente o arquivo de   */
+            registerFound = 1;                              /*  veiculo deve ser incrementado para procurar */
+                                                            /*  por mais veiculos com o mesmo codLinha      */
+            print_veiculo_data(veiculoHeader, veiculoData);
+            print_linha_data(linhaHeader, linhaData);
+            printf("\n");
+        
+            veiculoCounter++;
+            free(veiculoData);
+            veiculoData = read_binary_veiculo_data(orderedVeiculoFile);
+        }
+    }
+
+    if (registerFound == NOT_FOUND) {       /* Caso a flag de impressão não tenha sido  */
+        printf("Registro inexistente.\n");  /*  atribuida durante a execução do         */
+    }                                       /*  algoritmo, então não existe registro    */
+    
+    /* Liberação da memória */
+    free(veiculoHeader);
+    free(veiculoData);
+    free(linhaHeader);
+    free(linhaData);
+    fclose(unorderedVeiculoFile);
+    fclose(orderedVeiculoFile);
+    fclose(unorderedLinhaFile);
+    fclose(orderedLinhaFile);
 }

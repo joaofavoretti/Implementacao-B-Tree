@@ -1,5 +1,5 @@
 /**
- * Trabalho Prático 2 - Organizacao de Arquivos
+ * Trabalho Prático 3 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
  */
@@ -7,13 +7,14 @@
 #ifndef INCLUDE_IO_LINHA_READ_H
 #define INCLUDE_IO_LINHA_READ_H
 
-#include <util.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define FAIL_BINARY_STATUS 0
 #define LINHA_HEADER_SIZE 82     /* Tamanho do cabecalho do ao arquivo binario linha */
+
+#define ORDERED_LINHA_FILENAME "o_linha.bin"
 
 /**
  * Struct para armazenar o cabecalho do arquivo tipo linha

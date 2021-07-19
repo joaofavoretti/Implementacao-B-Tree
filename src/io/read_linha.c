@@ -1,10 +1,11 @@
 /**
- * Trabalho Prático 2 - Organizacao de Arquivos
+ * Trabalho Prático 3 - Organizacao de Arquivos
  * Nome: João Pedro Favoretti (11316055)
  * Nome: Lucas Pilla (10633328)
  */
 
 #include <io/read_linha.h>
+#include <util.h>
 
 linha_header *read_csv_linha_header(FILE *csvFilePointer)
 {
